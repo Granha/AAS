@@ -10,4 +10,7 @@ class TaskFinishEvent:
     def getTask(self):
         return self.task
 
+    def getPriority(self):
+        return self.time
+
 # TaskFinishEvent

@@ -10,4 +10,7 @@ class IOCompleteEvent:
     def getTask(self):
         return self.task
 
+    def getPriority(self):
+        return self.time
+
 # IOCompleteEvent

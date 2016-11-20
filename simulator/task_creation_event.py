@@ -10,4 +10,7 @@ class TaskCreationEvent:
     def getTask(self):
         return self.task
 
+    def getPriority(self):
+        return self.time
+
 # TaskCreationEvent

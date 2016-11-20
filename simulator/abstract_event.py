@@ -5,4 +5,7 @@ class AbstractEvent:
     def getTime():
         return None
 
+    def getPriority():
+        return None
+    
 # AbstractEvent

@@ -8,10 +8,19 @@ class AbstractScheduler:
     def timerIntr():
         return None
 
-    def ioStart():
+    def block(task):
         return None
 
-    def ioEnd():
+    def unblock(task):
         return None
 
+    def finishTask(task):
+        return None
+
+    def createTask(task):
+        return None
+
+    def setProcessor(processor):
+        return None
+    
 # AbstractScheduler
