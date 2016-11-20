@@ -10,18 +10,22 @@ class Processor:
     def getRunningTask():
         return self.runningTask
 
+    # Prempt running task of NOP
+    # if no task is running
     def premptRunningTask():
         runningTask = self.runningTask
 
-        runningTask.incUsedCpuTime(self.tickCurTask)
+        if runningTask is not None:
+            runningTask.incUsedCpuTime(self.tickCurTask)
 
         self.runningTask = None
         self.tickCurTask = 0
-        return self.runningTask
+        
+        return runningTask
 
     def runTask(task):
-        self.runningTask = task
         self.tickCurTask = 0
+        self.runningTask = task
 
     def setTime(self, time):
         self.cpuTime = time

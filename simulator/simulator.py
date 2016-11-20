@@ -29,8 +29,8 @@ class Simulator:
         task = self.processor.getRunningTask()
         assert not task.isInIO()
 
-        if task is None:
-            return
+        if task is None or task.isIdleTask():
+            return        
         
         nextEvent = queue.getMin()
 
@@ -76,7 +76,9 @@ class Simulator:
         
         # first timer event
         timerEvent = TimerEvent(1)
-        queue.addEvent(timerEvent)        
+        queue.addEvent(timerEvent)
+
+        self.scheduler.start()
 
         # Main Loop
         while not isEmpty(queue):
@@ -150,5 +152,6 @@ class Simulator:
                 sys.exit(1)
 
             self.genNonTriggeredEvents(queue)
-        # while                    
+        # while
+
 # Simulator

@@ -16,13 +16,13 @@ class EventQueue:
     def addEvent(self, event):
         heapq.heappush(self.queue, (event.getPriority(), event))
 
-    def extractMin(self):
-        return heapq.heappop(self.queue)
-
     def getMin(self):
         if len(self.queue) == 0:
             return None
 
-        return self.queue[0]
+        return self.queue[0]        
+
+    def extractMin(self):
+        return heapq.heappop(self.queue)
 
 # EventQueue

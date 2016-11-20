@@ -2,7 +2,7 @@
 # must comply to this interface.
 class AbstractScheduler:
 
-    def getTimeSlice():
+    def start():
         return None
 
     def timerIntr():

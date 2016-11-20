@@ -78,4 +78,7 @@ class Task:
     # Reset internal state
     def reset(self):
         self.nextIO = 0
+
+    def isIdleTask():
+        return False
 # Task
