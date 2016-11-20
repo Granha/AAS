@@ -7,12 +7,18 @@ class Processor:
         self.tickCurTask = 0
         self.runningTask = None
 
-    def getRunningTask():
+    def getTime(self):
+        return self.cpuTime
+
+    def getTicks(self):
+        return self.cpuTicks
+    
+    def getRunningTask(self):
         return self.runningTask
 
     # Prempt running task of NOP
     # if no task is running
-    def premptRunningTask():
+    def premptRunningTask(self):
         runningTask = self.runningTask
 
         if runningTask is not None:
@@ -23,7 +29,7 @@ class Processor:
         
         return runningTask
 
-    def runTask(task):
+    def runTask(self, task):
         self.tickCurTask = 0
         self.runningTask = task
 

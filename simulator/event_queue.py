@@ -1,7 +1,10 @@
+import heapq
+
 class EventQueue:
 
     def __init__(self, events):
-        self.queue = heapq.heapify(creationEvents)
+        heapq.heapify(events)
+        self.queue = events
 
     def getSize(self):
         return len(self.queue)
@@ -20,9 +23,9 @@ class EventQueue:
         if len(self.queue) == 0:
             return None
 
-        return self.queue[0]        
+        return self.queue[0][1]        
 
     def extractMin(self):
-        return heapq.heappop(self.queue)
+        return heapq.heappop(self.queue)[1]
 
 # EventQueue

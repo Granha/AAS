@@ -1,21 +1,21 @@
-from simulator.task_creation_event import TaskCreationEvent
+from task_creation_event import TaskCreationEvent
 
 class Workload:
 
     def __init__(self, tasks):
         # restore task state first
-        for tasks in tasks:
+        for task in tasks:
             task.reset()
 
         self.tasks = tasks
 
-    def getCreationEvents(self):
+    def getInitialEvents(self):
         events = []
 
         for task in self.tasks:
             creationTime = task.getCreationTime()
             creationEvent = TaskCreationEvent(creationTime, task)
-            events.append((creationTime.priority(), creationEvent))
+            events.append((creationEvent.getPriority(), creationEvent))
 
         return events
 

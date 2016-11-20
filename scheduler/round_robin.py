@@ -12,45 +12,48 @@ class RoundRobin:
         self.idleTask = IdleTask()
         self.curTaskTicks = 0
 
-    def enqueue(self, task):
-        if not task.isIdleTask():
+    def enqueue(self, task):        
+        if task is not None and \
+           not task.isIdleTask():
             self.fifo.append(task)
 
-    def start():
+    def start(self):
         self.schedule()
 
-    def timerIntr(ticks):
+    def timerIntr(self, ticks):
         self.curTaskTicks += 1
         
-        if self.curTaskTicks >= TimeSlice:
+        if self.curTaskTicks >= RoundRobin.TimeSlice:
             self.schedule()
 
-    def block(task):
+    def block(self, task):
         self.schedule()
 
-    def unblock(task):
+    def unblock(self, task):
         self.enqueue(task)        
         self.schedule()
 
-    def finishTask(task):
+    def finishTask(self, task):
         self.schedule()
 
-    def createTask(task):
+    def createTask(self, task):
         self.enqueue(task)        
         self.schedule()
 
-    def setProcessor(processor):
+    def setProcessor(self, processor):
         self.processor = processor
 
     def nextToRun(self):
-        if len(self.queue) == 0:
+        if len(self.fifo) == 0:
             return self.idleTask
 
-        return self.queue.pop(0)
+        return self.fifo.pop(0)
 
     def schedule(self):
         task = self.processor.premptRunningTask()
+        
         self.enqueue(task)
+        
         next = self.nextToRun()
 
         assert next is not None

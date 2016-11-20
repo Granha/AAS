@@ -1,10 +1,12 @@
-from simulator.processor import Processor
+from processor import Processor
 
 # Events
-from simulator.task_creation_event import TaskCreationEvent
-from simulator.task_creation_event import TaskFinishEvent
-from simulator.io_start_event import IOStartEvent
-from simulator.io_complete_event import IOCompleteEvent
+from event_queue import EventQueue
+from task_creation_event import TaskCreationEvent
+from task_finish_event import TaskFinishEvent
+from timer_event import TimerEvent
+from io_start_event import IOStartEvent
+from io_complete_event import IOCompleteEvent
 
 import sys
 
@@ -52,7 +54,7 @@ class Simulator:
                 queue.addEvent(ioStartEvent)
             # fi
         else:
-            relativeFinishTime = io.getTotalCpuTime() - task.getUseCpuTime()
+            relativeFinishTime = task.getTotalCpuTime() - task.getUseCpuTime()
             
             if window > relativeFinishTime:
                 time = self.processor.getTime() + relativeFinishTime
@@ -64,7 +66,7 @@ class Simulator:
     
     def run(self):                
         # initialize event queue with creation
-        initialEvents = self.workload.getInitialEvent()
+        initialEvents = self.workload.getInitialEvents()
         queue = EventQueue(initialEvents)
 
         # number of alive tasks
@@ -81,7 +83,7 @@ class Simulator:
         self.scheduler.start()
 
         # Main Loop
-        while not isEmpty(queue):
+        while not queue.isEmpty():
             event = queue.extractMin()
 
             # time can be an arbitrary real number
@@ -91,7 +93,7 @@ class Simulator:
                 print "Timer Event"
 
                 # tick is only integer
-                self.processor.setTicks(event.getTicks())
+                self.processor.setTicks(event.getTime())
 
                 # inform scheduler of timer interrupt
                 self.scheduler.timerIntr(self.processor.getTicks())
@@ -124,7 +126,7 @@ class Simulator:
             elif isinstance(event, IOStartEvent):
                 task = event.getTask()
                 
-                premptRunningTask()
+                self.processor.premptRunningTask()
                 
                 print "IO Start - ", task.getName()
 

@@ -2,25 +2,25 @@
 # must comply to this interface.
 class AbstractScheduler:
 
-    def start():
+    def start(self):
         return None
 
-    def timerIntr():
+    def timerIntr(self):
         return None
 
-    def block(task):
+    def block(self, task):
         return None
 
-    def unblock(task):
+    def unblock(self, task):
         return None
 
-    def finishTask(task):
+    def finishTask(self, task):
         return None
 
-    def createTask(task):
+    def createTask(self, task):
         return None
 
-    def setProcessor(processor):
+    def setProcessor(self, processor):
         return None
     
 # AbstractScheduler

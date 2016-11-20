@@ -8,7 +8,7 @@ class Task:
         self.totalCpuTime = totalCpuTime
         self.ioList = ioList
         self.nextIO = 0
-        self.isInIO = False
+        self.boolIsInIO = False
 
     ######################
     #     getters
@@ -20,7 +20,7 @@ class Task:
         return priority
 
     def getUseCpuTime(self):
-        return usedCpuTime
+        return self.usedCpuTime
 
     def getCreationTime(self):
         return self.creationTime
@@ -48,10 +48,10 @@ class Task:
     #   Simulator methods
     ##########################
     def isInIO(self):
-        return self.isInIO
+        return self.boolIsInIO
     
     def setInIO(self, val):
-        self.isInIO = val
+        self.boolIsInIO = val
     
     def popNextIO(self):
         io = self.getNextIO()
@@ -79,6 +79,6 @@ class Task:
     def reset(self):
         self.nextIO = 0
 
-    def isIdleTask():
+    def isIdleTask(self):
         return False
 # Task

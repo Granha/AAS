@@ -8,7 +8,7 @@ class IO:
         self.duration = duration
 
     def getOffsetTime(self):
-        retunr self.offsetTime
+        return self.offsetTime
 
     def getDuration(self):
         return self.duration
