@@ -20,6 +20,47 @@ class Simulator:
     def setWorkload(self, workload):
         self.workload = workload
         return None
+
+    # Generate Events that are not triggered by
+    # the processing of other events, namely
+    # IO Start and Task Finish. The logic for
+    # these event is more sophisticated.
+    def genNonTriggeredEvents(self, queue):
+        task = self.processor.getRunningTask()
+        assert not task.isInIO()
+
+        if task is None:
+            return
+        
+        nextEvent = queue.getMin()
+
+        # there must always exist at least a timer interrupt
+        assert nextEvent is not None
+
+        window = nextEvent.getTime() - self.processor.getTime()
+                
+        if task.stillHasIO():
+            io = task.getNextIO()
+
+            relativeIOTime = io.getOffsetTime() - task.getUseCpuTime()
+
+            # IO will occur between the current time and the next event                    
+            if  window > relativeIOTime:
+                time = self.processor.getTime() + relativeIOTime
+                duration = io.getDuration()
+                ioStartEvent =  IOStartEvent(time, task, duration)
+                queue.addEvent(ioStartEvent)
+            # fi
+        else:
+            relativeFinishTime = io.getTotalCpuTime() - task.getUseCpuTime()
+            
+            if window > relativeFinishTime:
+                time = self.processor.getTime() + relativeFinishTime
+                taskFinishEvent =  TaskFinishEvent(time, task)
+                queue.addEvent(taskFinishEvent)
+            # fi
+        # fi
+    # genEvent
     
     def run(self):                
         # initialize event queue with creation
@@ -108,31 +149,6 @@ class Simulator:
                 print "Unkown event"
                 sys.exit(1)
 
-            task = self.processor.getRunningTask()
-            assert not task.isInIO()
-
-            # check if Start IO event must be generated
-            if task is not None:
-                nextEvent = queue.getMin()
-
-                # there must always exist at least a timer interrupt
-                assert nextEvent is not None
-
-                window = nextEvent.getTime() - self.processor.getTime()
-                
-                if task.stillHasIO():
-                    io = task.getNextIO()
-
-                    relativeIOTime = io.getOffsetTime() - task.getUseCpuTime()
-
-                    # IO will occur between the current time and the next event                    
-                    if  window > relativeIOTime:
-                        time = self.processor.getTime() + relativeIOTime
-                        duration = io.getDuration()
-                        ioStartEvent =  IOStartEvent(time, task, duration)
-                        queue.addEvent(ioStartEvent)
-                    # fi
-                # fi
-            # fi
+            self.genNonTriggeredEvents(queue)
         # while                    
 # Simulator
