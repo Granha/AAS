@@ -104,7 +104,7 @@ class Simulator:
             elif isinstance(event, TaskCreationEvent):
                 task = event.getTask()
                 
-                print "Creating Task - ", task.getName()
+                print "Creating Task: ", task.getName()
 
                 # inform scheduler of task creation
                 self.scheduler.createTask(task)
@@ -112,7 +112,9 @@ class Simulator:
             elif isinstance(event, TaskFinishEvent):
                 task = event.getTask()
                 
-                print "Finishing Task - ", task.getName()
+                print "Finishing Task: ", task.getName()
+
+                sys.exit(1)                
 
                 # inform scheduler that task finished
                 self.scheduler.finishTask(task)
@@ -154,6 +156,8 @@ class Simulator:
                 sys.exit(1)
 
             self.genNonTriggeredEvents(queue)
+
+            print "Running Task", self.processor.getRunningTask().getName()
         # while
 
 # Simulator

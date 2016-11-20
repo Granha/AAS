@@ -4,7 +4,7 @@ class Processor:
     def __init__(self):
         self.cpuTime = 0
         self.cpuTicks = 0
-        self.tickCurTask = 0
+        self.startTimeCurTask = 0
         self.runningTask = None
 
     def getTime(self):
@@ -22,7 +22,8 @@ class Processor:
         runningTask = self.runningTask
 
         if runningTask is not None:
-            runningTask.incUsedCpuTime(self.tickCurTask)
+            ellapsed =  self.getTime() - self.startTimeCurTask
+            runningTask.incUsedCpuTime(ellapsed)
 
         self.runningTask = None
         self.tickCurTask = 0
@@ -30,7 +31,7 @@ class Processor:
         return runningTask
 
     def runTask(self, task):
-        self.tickCurTask = 0
+        self.startTimeCurTask = self.getTime()
         self.runningTask = task
 
     def setTime(self, time):
