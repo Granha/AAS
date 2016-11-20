@@ -1,6 +1,7 @@
 class Task:
 
-    def __init__(self, name, priority, creationTime, totalCpuTime, ioList):
+    def __init__(self, name, priority, creationTime,
+                 totalCpuTime, ioList):
         self.name = name
         self.priority = priority
         self.usedCpuTime = 0

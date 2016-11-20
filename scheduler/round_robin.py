@@ -1,7 +1,8 @@
+from abstract_scheduler import AbstractScheduler
 from task.idle_task import IdleTask
 
 # Basic Round Robin Scheduler
-class RoundRobin:
+class RoundRobin(AbstractScheduler):
 
     # Time Slice in ticks
     TimeSlice = 4

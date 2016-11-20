@@ -48,6 +48,7 @@ class Simulator:
 
             # IO will occur between the current time and the next event                    
             if  window > relativeIOTime:
+                task.popNextIO()
                 time = self.processor.getTime() + relativeIOTime
                 duration = io.getDuration()
                 ioStartEvent =  IOStartEvent(time, task, duration)
@@ -111,10 +112,12 @@ class Simulator:
                 
             elif isinstance(event, TaskFinishEvent):
                 task = event.getTask()
+
+                self.processor.premptRunningTask()                
                 
                 print "Finishing Task: ", task.getName()
-
-                sys.exit(1)                
+                print "Used CPU Time: ", task.getUseCpuTime()
+                print "Total CPU Time: ", task.getTotalCpuTime()
 
                 # inform scheduler that task finished
                 self.scheduler.finishTask(task)
@@ -130,7 +133,9 @@ class Simulator:
                 
                 self.processor.premptRunningTask()
                 
-                print "IO Start - ", task.getName()
+                print "IO Start: ", task.getName()
+                print "IO Durration: ", event.getDuration()
+                print "Used CPU time: ", task.getUseCpuTime()
 
                 task.setInIO(True)
 
@@ -138,14 +143,14 @@ class Simulator:
                 self.scheduler.block(task)
 
                 duration = event.getDuration()
-                time = self.processor.getTicks() + duration
+                time = self.processor.getTime() + duration
 
                 ioCompleteEvent = IOCompleteEvent(time, task)
                 queue.addEvent(ioCompleteEvent)
                 
             elif isinstance(event, IOCompleteEvent):
                 task = event.getTask()
-                print "IO Complete - ", task.getName()
+                print "IO Complete: ", task.getName()
 
                 task.setInIO(False)
 
