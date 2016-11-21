@@ -1,3 +1,8 @@
+############################################
+# Standard Idle Task used by schedulers to
+# always have a runnable task
+############################################
+
 from task import Task
 
 class IdleTask(Task):

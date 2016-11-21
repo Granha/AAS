@@ -1,3 +1,9 @@
+################################################
+# A Task plays the role of a logical
+# execution unit in the Operating System.
+# To avoid duplication of information, this
+# class is used by the Simulator and schedulers.
+#################################################
 class Task:
 
     def __init__(self, name, priority, creationTime,
