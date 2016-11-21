@@ -10,6 +10,8 @@ class Task:
         self.ioList = ioList
         self.nextIO = 0
         self.boolIsInIO = False
+        self.nice = 0
+        self.recentCpu = 0
 
     ######################
     #     getters
@@ -32,6 +34,12 @@ class Task:
     def getIOList(self):
         return self.ioList
 
+    def getRecentCpu(self):
+        return self.recentCpu
+
+    def getNice(self):
+        return self.nice
+
     def getRemainingCpuTime(self):
         return self.totalCpuTime - self.usedCpuTime
 
@@ -39,6 +47,21 @@ class Task:
         return self.ioList.get(self.nextIO)
 
     #######################
+    #      setters
+    #######################
+    def setPriority(self, priority):
+        self.priority = priority
+    
+    def setRecentCpu(self, recentCpu):
+        self.recentCpu = recentCpu
+
+    def setNice(self, nice):
+        self.nice = nice
+
+    ############################
+        
+    def incRecentCpu(self):
+        self.recentCpu += 1
 
     #######################
     #   Scheduler methods
