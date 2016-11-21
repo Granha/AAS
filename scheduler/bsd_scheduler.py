@@ -113,6 +113,8 @@ class BSDScheduler(AbstractScheduler):
             self.schedule()
 
     def block(self, task):
+        task.incTimesBlocked()
+        
         self.schedule()
 
     def unblock(self, task):

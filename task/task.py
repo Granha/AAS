@@ -12,6 +12,9 @@ class Task:
         self.boolIsInIO = False
         self.nice = 0
         self.recentCpu = 0
+        self.timesBlocked = 0
+        self.totalReadyWait = 0
+        self.timesScheduled = 0
 
     ######################
     #     getters
@@ -40,6 +43,23 @@ class Task:
     def getNice(self):
         return self.nice
 
+    def getTimesBlocked(self):
+        return self.timesBlocked
+
+    def getTotalReadyWait(self):
+        return self.totalReadyWait
+
+    def getTimesScheduled(self):
+        return self.timesScheduled
+
+    def getAvgBlocking(self):
+        return float(self.getTimesBlocked)/\
+            self.getUseCpuTime()
+
+    def getAvgReadyWait(self):
+        return float(self.getTotalReadyWait())/\
+            self.getTimesScheduled()
+
     def getRemainingCpuTime(self):
         return self.totalCpuTime - self.usedCpuTime
 
@@ -62,6 +82,12 @@ class Task:
         
     def incRecentCpu(self):
         self.recentCpu += 1
+
+    def incTimesBlocked(self):
+        self.timesBlocked += 1
+
+    def incTimesScheduled(self):
+        self.timesScheduled += 1        
 
     #######################
     #   Scheduler methods

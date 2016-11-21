@@ -28,6 +28,8 @@ class RoundRobin(AbstractScheduler):
             self.schedule()
 
     def block(self, task):
+        self.incTimesBlocked()
+        
         self.schedule()
 
     def unblock(self, task):
