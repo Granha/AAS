@@ -21,7 +21,11 @@ class WorkloadFeatures:
 
     # compute Fourier coefficients
     def computeFourier(self, tasks):
+        interactVec = Metric.interacMetric(tasks)
 
+        # TODO: select largest frequencies in
+        # absolute value
+        numpy.fft(interactVec)        
     # computeFourier
     
 # WorkloadFeatures
