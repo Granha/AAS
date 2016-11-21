@@ -1,3 +1,12 @@
+####################################################
+#
+#          BSD Scheduler
+#
+# Implementation from:
+# https://www.classes.cs.uchicago.edu/archive/2016/
+# fall/23000-1/pintos/doc/html/pintos_7.html#SEC131
+####################################################
+
 from abstract_scheduler import AbstractScheduler
 from mlfq import MLFQ
 
