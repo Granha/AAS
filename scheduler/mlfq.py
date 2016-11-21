@@ -2,10 +2,11 @@
 class MLFQ:
 
     def __init__(self, minPri, maxPri):
-        self.queues = [ [] for i in xrange(Levels) ]
         self.minPri = minPri
-        self.maxPri = maxPri        
-
+        self.maxPri = maxPri
+        self.levels = maxPri - minPri + 1
+        self.queues = [ [] for i in xrange(self.levels) ]
+        
     def enqueue(self, task):
         
         if task is None or \
@@ -39,7 +40,7 @@ class MLFQ:
 
     def bestPriority(self):
         
-        for i in xrange(self.queues):
+        for i in xrange(self.levels):
             
             queue = self.queues[i]
             
@@ -49,10 +50,10 @@ class MLFQ:
         return None
 
     def listify(self):
-        return [ task for queue in self.queue for task in queue]
+        return [ task for queue in self.queues for task in queue]
 
     def empitfy(self):
-        self.queues = [ [ ] for i in xrange(Levels) ]
+        self.queues = [ [ ] for i in xrange(self.levels) ]
 
     def addList(self, tasks):
         

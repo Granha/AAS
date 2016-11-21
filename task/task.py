@@ -20,7 +20,7 @@ class Task:
         return self.name
 
     def getPriority(self):
-        return priority
+        return self.priority
 
     def getUseCpuTime(self):
         return self.usedCpuTime

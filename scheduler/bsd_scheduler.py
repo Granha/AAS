@@ -9,10 +9,14 @@
 
 from abstract_scheduler import AbstractScheduler
 from mlfq import MLFQ
+from task.idle_task import IdleTask
+
+# hard parameters of BSD scheduler
+Alpha = (59.0/60, 1.0/60, 4.0, 2.0, 2.0)
 
 # BSD (concrete) scheduler
 class BSDScheduler(AbstractScheduler):
-
+    
     # Time Slice in ticks
     TimeSlice = 4
 
@@ -23,12 +27,13 @@ class BSDScheduler(AbstractScheduler):
     MinPri = 0
     MaxPri = 63
 
-    def __init__(self):
-        self.mlfq = MLFQ(MinPri, MaxPri)
+    def __init__(self, alpha=Alpha):
+        self.mlfq = MLFQ(BSDScheduler.MinPri, BSDScheduler.MaxPri)
         self.processor = None
         self.idleTask = IdleTask()
         self.curTaskTicks = 0
         self.loadAvg = 0.0
+        self.alpha = alpha
 
     def enqueue(self, task):
         self.mlfq.enqueue(task)
@@ -47,12 +52,14 @@ class BSDScheduler(AbstractScheduler):
             recentCpu = task.getRecentCpu()
             nice = task.getNice()
 
-            priority = BSDScheduler.MaxPri - (recentCpu/4.0) - (nice*2)
+            priority = BSDScheduler.MaxPri - (recentCpu/self.alpha[2]) - (nice*self.alpha[3])
 
             if priority > BSDScheduler.MaxPri:
                 priority = BSDScheduler.MaxPri
             elif priority < BSDScheduler.MinPri:
-                priority = BSDScheduler.MinPri                
+                priority = BSDScheduler.MinPri
+
+            priority = int(priority)
 
             task.setPriority(priority)
 
@@ -68,7 +75,9 @@ class BSDScheduler(AbstractScheduler):
             recentCpu = task.getRecentCpu()
             nice = task.getNice()
 
-            recentCpu = ((2*self.loadAvg)/(2*self.loadAvg +1.0))*recentCpu + nice
+            recentCpu = ((self.alpha[4]*self.loadAvg)/(self.alpha[4]*self.loadAvg +1.0))\
+                        *recentCpu  + nice
+            
             task.setRecentCpu(recentCpu)
 
         readyThreads = len(tasks)
@@ -77,7 +86,7 @@ class BSDScheduler(AbstractScheduler):
         if not runningTask.isIdleTask():
             readyThreads += 1
 
-        self.loadAvg = (59.0/60)*self.loadAvg + (1.0/60)*readyThreads
+        self.loadAvg = self.alpha[0]*self.loadAvg + self.alpha[1]*readyThreads
                 
     def timerIntr(self, ticks):
         self.curTaskTicks += 1
