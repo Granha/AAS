@@ -147,7 +147,7 @@ class BSDScheduler(AbstractScheduler):
         assert next is not None
 
         self.curTaskTicks = 0
-        
+
         self.processor.runTask(next)        
 
 # BSDScheduler

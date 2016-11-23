@@ -21,6 +21,7 @@ class Task:
         self.timesBlocked = 0
         self.totalReadyWait = 0
         self.timesScheduled = 0
+    # __init__
 
     ######################
     #     getters
@@ -31,7 +32,7 @@ class Task:
     def getPriority(self):
         return self.priority
 
-    def getUseCpuTime(self):
+    def getUsedCpuTime(self):
         return self.usedCpuTime
 
     def getCreationTime(self):
@@ -59,8 +60,8 @@ class Task:
         return self.timesScheduled
 
     def getAvgBlocking(self):
-        return float(self.getTimesBlocked)/\
-            self.getUseCpuTime()
+        return float(self.getTimesBlocked())/\
+            self.getUsedCpuTime()
 
     def getAvgReadyWait(self):
         return float(self.getTotalReadyWait())/\
@@ -83,6 +84,19 @@ class Task:
 
     def setNice(self, nice):
         self.nice = nice
+
+    def setUsedCpuTime(self, usedCpuTime):
+        assert usedCpuTime <= self.getTotalCpuTime()
+        self.usedCpuTime = usedCpuTime
+
+    def setTimesBlocked(self, timesBlocked):
+        self.timesBlocked = timesBlocked
+
+    def setTotalReadyWait(self, totalReadyWait):
+        self.totalReadyWait = totalReadyWait
+
+    def setTimesScheduled(self, timesScheduled):
+        self.timesScheduled = timesScheduled
 
     ############################
         
@@ -130,6 +144,9 @@ class Task:
     #################################
     def incUsedCpuTime(self, amount):
         self.usedCpuTime += amount
+
+# TODO: work on this bug
+#        assert self.getUsedCpuTime() <= self.getTotalCpuTime()
 
     # Reset internal state
     def reset(self):

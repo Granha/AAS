@@ -2,15 +2,18 @@
 class Metric:
 
     # interactiveness estimate
-    def interacMetric(self, tasks):
+    @staticmethod
+    def interacMetric(tasks):
         
         interact = [ task.getAvgBlocking() for task in tasks ]
 
         return interact
-    # interacMetric 
+    # interacMetric
+
 
     # minimization objective function
-    def objFunction(self, tasks):
+    @staticmethod
+    def objFunction(tasks):
         interact = interacMetric(self, tasks)
         
         # processing estimate
