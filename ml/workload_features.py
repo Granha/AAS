@@ -1,7 +1,7 @@
 from metric.metric import Metric
+from numpy.fft import fft
 
 import numpy as np
-import np.fft
 
 class WorkloadFeatures:
     
@@ -11,7 +11,8 @@ class WorkloadFeatures:
     def __init__(self, tasks):
         # stores the first NumMoment moments
         # of the interactiveness distribution
-        self.moments = None
+        self.moments = [ None for i in \
+                         xrange(WorkloadFeatures.NumMoment)]
         self.fourier = None
         self.features = None
 
@@ -34,13 +35,17 @@ class WorkloadFeatures:
     # compute moments of interactiveness
     def computeMoments(self, tasks):
         interactVec = Metric.interacMetric(tasks)
+
+        # use the counting measure        
+        n = len(interactVec)        
         
         # note that we work with the count measure,
         # thus the following moment computation is
         # correct
-        for i in xrange(1,WorkloadFeatures.NumMoment):
+        for i in xrange(1,WorkloadFeatures.NumMoment+1):
 
-            self.moments[i] = [inter**i for inter in interactVec ]
+            self.moments[i-1] = sum([inter**i for inter \
+                                     in interactVec ])/float(n)
 
         return self.moments
     # computeMoments
@@ -53,11 +58,11 @@ class WorkloadFeatures:
 
         assert len(tasks) > 0
 
-        coeff = numpy.fft(interactVec)
+        coeff = list(fft(interactVec))
 
-        # remove frequency zero corresponding to
+        # frequency zero corresponding to
         # the integral of the original signal
-        coeff.pop(0)
+        coeff[0] = 0
 
         coeff = np.abs(coeff)
         maxFreq = np.argmax(coeff)
