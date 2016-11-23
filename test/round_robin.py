@@ -7,12 +7,12 @@ from simulator.workload_generator import WorkloadGenerator
 
 if __name__ == '__main__':
     
-    wGen = WorkloadGenerator()
+    wGen = WorkloadGenerator(10,5, 2, 5, 2, 1, 1, 1000)
     scheduler = RoundRobin()
     
     simulator = Simulator(scheduler)
 
-    workload = wGen.dummyGen()
+    workload = wGen.generateWorkload()
 
     simulator.setWorkload(workload)
 

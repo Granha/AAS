@@ -1,12 +1,24 @@
-from io.io import IO
-from io.io_list import IOList
+from iom.io import IO
+from iom.io_list import IOList
 from task.task import Task
 from workload import Workload
+from io_generator import IOGenerator
+import numpy as np
+import random
+import logging
 
 class WorkloadGenerator:
 
-    def __init__(self):
+    def __init__(self, num_jobs, rate_jobs, rate_io, mean_job_time, mean_io_time, sd_job_time, sd_io_time, time_unit):
         self.state = None
+        self.num_jobs = num_jobs
+        self.rate_jobs = rate_jobs
+        self.rate_io = rate_io
+        self.mean_job_time = mean_job_time
+        self.mean_io_time = mean_io_time
+        self.sd_job_time = sd_job_time
+        self.sd_io_time = sd_io_time
+        self.time_unit = time_unit
 
     # dummy generator for initial tests
     def dummyGen(self):
@@ -23,5 +35,29 @@ class WorkloadGenerator:
         w = Workload([t1, t2])
 
         return w
-    
+   
+    def generateWorkload(self):
+       W =[]
+       logging.basicConfig(filename='example.log',level=logging.DEBUG)
+       creation_Time = 0
+       i=0
+       TotalCPUTime = np.random.normal(self.mean_job_time,self.sd_job_time)
+       TotalCPUTime = round(TotalCPUTime*self.time_unit) 
+       logging.info('Task'+str(i)+":Creation Time:"+str(creation_Time)+":Total CPU time:"+str(TotalCPUTime))
+       IO = IOGenerator( self.rate_io, TotalCPUTime, self.mean_io_time, self.sd_io_time, self.time_unit)
+       iolist = IOList( IO.generateIOEvent())
+       T = Task("Task 0", 0, creation_Time, TotalCPUTime, iolist)
+       W.append(T)
+
+       for i in range(self.num_jobs):
+          creation_Time = round(random.expovariate(self.rate_jobs)*self.time_unit)+W[-1].creationTime
+          TotalCPUTime =  np.random.normal(self.mean_job_time,self.sd_job_time)
+          TotalCPUTime = round(TotalCPUTime*self.time_unit)
+          logging.info('Task'+str(i)+":Creation Time:"+str(creation_Time)+":Total CPU time:"+str(TotalCPUTime))
+          IO = IOGenerator( self.rate_io, TotalCPUTime, self.mean_io_time, self.sd_io_time, self.time_unit)
+          iolist = IOList( IO.generateIOEvent())
+          T = Task("Task "+str(i), 0, creation_Time, TotalCPUTime, iolist)
+          W.append(T)
+       w =Workload(W)
+       return w     
 # WorkloadGenerator
