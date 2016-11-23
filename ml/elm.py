@@ -29,7 +29,8 @@ class ELM:
         self.outputLayer = None
 
 
-    def initELM(self, n=0, k=0, m=200, actFunc=np.tanh):
+    def initELM(self, n=0, k=0, m=200,
+                activationFunc=np.tanh):
         self.n = n
         self.k = k
         self.m = m
@@ -82,7 +83,7 @@ class ELM:
 
         assert self.inputLayer is not None
 
-        outVec = self.activationFunc(np.matmul(self.inputLayer, data))
+        outVec = self.activationFunc(np.dot(self.inputLayer, data))
 
         return outVec
     # processSingleInputLayer
@@ -93,7 +94,7 @@ class ELM:
         From a list of inputs compute the outputs of the neurons
         in the first layer.
         """
-        (l,n) = np.size(inData)
+        (l,n) = np.shape(inData)
 
         outM = np.zeros((l,self.m))
 
@@ -104,14 +105,14 @@ class ELM:
     # processInputLayer
 
     def train(self, inData, outData):
-        (l,n) = np.size(inData)
-        (p,k) = np.size(outData)
+        (l,n) = np.shape(inData)
+        (p,k) = np.shape(outData)
 
         assert l == p
 
         self.initELM(n, k)
 
-        self.outputLayer = np.zeros(k, m+1)
+        self.outputLayer = np.zeros((k, self.m+1))
 
         # add constant input
         inData = np.column_stack([np.ones((l,1)), inData])
@@ -125,19 +126,22 @@ class ELM:
         # use least squares to compute the best in l_2
         # coefficients for the output layer
         for kk in xrange(k):
-            self.outInputLayer[kk,:] = np.linalg.lstsq(outInputLayer,
-                                                       outData[:,kk])
+            coeff = np.linalg.lstsq(outInputLayer, outData[:,kk])[0]
+            self.outputLayer[kk,:] = coeff
     # train
 
     def processSingle(self, data):
 
         assert self.outputLayer is not None
 
+        # add constant input
+
+        data = [1] + list(data)
+
         outInputLayer = self.processSingleInputLayer(data)
 
         # add constant input
-        outInputLayer = np.column_stack([np.ones((l,1)),
-                                         outInputLayer])
+        outInputLayer = [1] + list(outInputLayer)        
 
         out = np.dot(self.outputLayer, outInputLayer)
 
@@ -145,7 +149,7 @@ class ELM:
     # processSingle
 
     def process(self, inData):
-        (l,n) = np.size(inData)
+        (l,n) = np.shape(inData)
 
         outM = np.zeros((l,self.k))
 
@@ -156,8 +160,8 @@ class ELM:
     # process
 
     def test(self, inData, outData):
-        (l,n) = np.size(inData)
-        (p,k) = np.size(outData)
+        (l,n) = np.shape(inData)
+        (p,k) = np.shape(outData)
 
         assert l == p
         assert l > 0
