@@ -7,7 +7,8 @@ class Metric:
         interact = [ task.getAvgBlocking() for task in tasks ]
 
         return interact
-    # interacMetric 
+    # interacMetric
+
 
     # minimization objective function
     def objFunction(self, tasks):
