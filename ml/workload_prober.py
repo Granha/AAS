@@ -1,9 +1,12 @@
 ##################################################
-# WorkloadLearner probes the parameter space of
-# a scheduler and learn dynamically the best
-# parameters for a given workload.
+# WorkloadProber probes the (workload, parameter)
+# space of a scheduler aggregating the tuples
+# (workload, parameter, objVal). These tuples
+# can be used to learn the mapping:
+#
+# workload |--> parameter.
 ###################################################
-class WorkloadLearner:
+class WorkloadProber:
 
     # used to determine the unit of time
     # to collect workload data
@@ -13,13 +16,12 @@ class WorkloadLearner:
     AlphaMult = 2
 
     def __init__(self, scheduler):
-        # indicates whether the Learning
+        # indicates whether the Prober
         # is probing the scheduler parameter space
         self.isProbing = False
         
-        # mapping from workload feature and scheduler
-        # parameter to objective value
-        self.mapping = []
+        # mathematical relation (feature, alpha, objVal)
+        self.relation = []
 
         self.scheduler = scheduler
 
@@ -35,7 +37,7 @@ class WorkloadLearner:
         # size of the alpha space
         self.nAlpha = reduce(lambda x,y: x*y, self.maxIndices)
 
-        self.nSamples = self.nAlpha*WorkloadLearner.AlphaMult
+        self.nSamples = self.nAlpha*WorkloadProber.AlphaMult
 
         self.curIdices = None
 
@@ -43,8 +45,18 @@ class WorkloadLearner:
         # and objective function information
         # for a given fixed alpha
         self.tickWindow = scheduler.getTimeSlice()*\
-                          WorkloadLearner.SliceMult
+                          WorkloadProber.SliceMult
     # __init__
+
+    def getRelation(self):
+        return self.relation
+
+    def getTickWindow(self):
+        return self.tickWindow
+
+    def isProbing(self):
+        return self.isProbing
+    # getIsProbing
 
     def incCurIndicesAux(self, i):
 
@@ -81,16 +93,20 @@ class WorkloadLearner:
 
         self.curIdices = [0 for i in xrange(len(self.maxIndices))]
 
-        self.mapping = []        
+        self.relation = []        
     # startProbing
 
     # Vary scheduler parameters
     # and store objective values
-    def probe(self):               
+    def probe(self, tasks):               
 
+        # nothing to do
         if not self.isProbing:
-            return
+            return False
 
+        # compute the features
+        # correspoding to the current
+        # alpha set in the previous pass
         if self.alpha is not None:
             wFeatures = WorkloadFeatures(tasks)
 
@@ -100,7 +116,7 @@ class WorkloadLearner:
 
         objVal = Metric.objFunction(tasks)
 
-        (wFeatures, alpha, objVal)
+        self.relation.append((wFeatures, alpha, objVal))
             
         if self.incCurIndices():
             self.isProbing = False
@@ -108,16 +124,6 @@ class WorkloadLearner:
             return True        
         
         return False
-    # probeScheduler
+    # probe
 
-    # Use Neural Network (ELM) to learn
-    # the best mapping from workload
-    # features to parameter
-    # (prior to this phase sufficient
-    # data must have been collected)
-    def learn(self):
-        
-        return None
-
-# WorkloadLearner
-
+# WorkloadProber
