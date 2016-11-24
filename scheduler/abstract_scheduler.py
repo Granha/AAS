@@ -22,5 +22,17 @@ class AbstractScheduler:
 
     def setProcessor(self, processor):
         return None
-    
+
+    def getTimeSlice(self):
+        return None
+
+    def getAlpha(self):
+        return None
+
+    def setAlpha(self):
+        return None
+
+    def getAlphaRange(self):
+        return None
+
 # AbstractScheduler

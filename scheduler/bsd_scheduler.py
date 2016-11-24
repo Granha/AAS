@@ -12,7 +12,7 @@ from mlfq import MLFQ
 from task.idle_task import IdleTask
 
 # hard parameters of BSD scheduler
-Alpha = (59.0/60, 1.0/60, 4.0, 2.0, 2.0)
+Alpha = (59.0/60, 4.0, 2.0, 2.0, 4)
 
 # BSD (concrete) scheduler
 class BSDScheduler(AbstractScheduler):
@@ -52,7 +52,7 @@ class BSDScheduler(AbstractScheduler):
             recentCpu = task.getRecentCpu()
             nice = task.getNice()
 
-            priority = BSDScheduler.MaxPri - (recentCpu/self.alpha[2]) - (nice*self.alpha[3])
+            priority = BSDScheduler.MaxPri - (recentCpu/self.alpha[1]) - (nice*self.alpha[2])
 
             if priority > BSDScheduler.MaxPri:
                 priority = BSDScheduler.MaxPri
@@ -75,7 +75,7 @@ class BSDScheduler(AbstractScheduler):
             recentCpu = task.getRecentCpu()
             nice = task.getNice()
 
-            recentCpu = ((self.alpha[4]*self.loadAvg)/(self.alpha[4]*self.loadAvg +1.0))\
+            recentCpu = ((self.alpha[3]*self.loadAvg)/(self.alpha[3]*self.loadAvg +1.0))\
                         *recentCpu  + nice
             
             task.setRecentCpu(recentCpu)
@@ -86,7 +86,7 @@ class BSDScheduler(AbstractScheduler):
         if not runningTask.isIdleTask():
             readyThreads += 1
 
-        self.loadAvg = self.alpha[0]*self.loadAvg + self.alpha[1]*readyThreads
+        self.loadAvg = self.alpha[0]*self.loadAvg + (1-self.alpha[0])*readyThreads
                 
     def timerIntr(self, ticks):
         self.curTaskTicks += 1
