@@ -2,6 +2,7 @@
 # Modulo containing the k-Means, k-Menas++ algorithms and
 # related functions.
 ###########################################################
+from common import getClusters
 from common import pointDist
 
 import numpy as np
@@ -153,6 +154,8 @@ def kmeans(k, points, EPS, flag=True, robustness=3):
           distortion: list of J_avg^2 for each cluster found
                       indexed by iteration
     """
+    assert k < len(points)
+    
     centroids, gamma, distortion = kmeansAux(k, points, EPS, flag)
 
     for i in xrange(robustness-1):

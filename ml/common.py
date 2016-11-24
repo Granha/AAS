@@ -45,8 +45,22 @@ def getRGBList(k):
 
     return samples
 # getRGBList
+
+def getClusters(points, gamma):
+    k = len(gamma)
+    assert k > 0
+    
+    clusters = [None]*k
+    
+    # group points in clusters
+    for i in xrange(k):
+        clusters[i] = [p for p,g in
+                      zip(points,gamma) if g == i]
+
+    return clusters
+# getClusters
                                       
-def cluster_figure(title, points, gamma, centroids):
+def clusterFigure(title, points, gamma, centroids):
     k = len(centroids)
                    
     d = pointDim(points)
@@ -61,20 +75,16 @@ def cluster_figure(title, points, gamma, centroids):
     ax.set_xlabel('x coordinate')
     ax.set_ylabel('y coordinate')
                    
-    cluster = [None]*k
-    # group points in clusters
-    for i in range(0,k):
-        cluster[i] = [p for p,g in\
-                      zip(points,gamma) if g == i]
+    clusters = getClusters(points, gamma)
         
     colors = getRGBList(k)
     
     # mark centroids
     for i in xrange(k):
-        ax.plot(proj(0, cluster[i]), proj(1, cluster[i]),
+        ax.plot(proj(0, clusters[i]), proj(1, clusters[i]),
                 'o', color=colors[i])
         ax.plot(proj(0, [centroids[i]]), proj(1, [centroids[i]]),
                 's', color=(0,0,0))
 
     return figCluster, ax
-# cluster_figure
+# clusterFigure

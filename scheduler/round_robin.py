@@ -1,5 +1,4 @@
 from abstract_scheduler import AbstractScheduler
-from task.idle_task import IdleTask
 
 # Basic Round Robin Scheduler
 class RoundRobin(AbstractScheduler):
@@ -8,12 +7,12 @@ class RoundRobin(AbstractScheduler):
     TimeSlice = 4
 
     def __init__(self):
+        AbstractScheduler.__init__(self)
         self.fifo = []
-        self.processor = None
-        self.idleTask = IdleTask()
         self.curTaskTicks = 0
+        self.setAlpha([RoundRobin.TimeSlice])
 
-    def enqueue(self, task):        
+    def enqueue(self, task):
         if task is not None and \
            not task.isIdleTask():
             self.fifo.append(task)
@@ -21,7 +20,7 @@ class RoundRobin(AbstractScheduler):
     def start(self):
         self.schedule()
 
-    def timerIntr(self, ticks):
+    def _timerIntr(self, ticks):
         self.curTaskTicks += 1
         
         if self.curTaskTicks >= RoundRobin.TimeSlice:
@@ -33,13 +32,13 @@ class RoundRobin(AbstractScheduler):
         self.schedule()
 
     def unblock(self, task):
-        self.enqueue(task)        
+        self.enqueue(task)
         self.schedule()
 
-    def finishTask(self, task):
+    def _finishTask(self, task):
         self.schedule()
 
-    def createTask(self, task):
+    def _createTask(self, task):
         self.enqueue(task)        
         self.schedule()
 
@@ -63,6 +62,6 @@ class RoundRobin(AbstractScheduler):
 
         self.curTaskTicks = 0
         
-        self.processor.runTask(next)        
+        self.processor.runTask(next)
         
 # RoundRobin

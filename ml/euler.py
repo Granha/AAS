@@ -18,6 +18,12 @@ class Euler:
     # 5 minutes (assuming 100 ticks is 1 second)
     CycleTicks = 5*60*100
 
+    # Minimum progress parameter for K-Means++
+    EPS = 1e-3
+
+    # Number of
+    K = 20
+
     def __init__(self, scheduler):
         self.prober = WorkloadProber(scheduler)
         self.scheduler = scheduler
@@ -33,10 +39,45 @@ class Euler:
     # data must have been collected)
     def learn(self, relation):
 
-        # TODO: use k++ to cluster the relation
-        # values
+        ###########################
+        #      Clustering
+        ###########################
+        k = Euler.K
+        points = [ features for (features, alpha, objVal) in relation ]
 
-        # TODO: learn using the ELM
+        centroids, gamma, distortion = kmeans(k, points, Euler.EPS)
+
+        ###############################
+        #    Learning pre-processing
+        ###############################
+        n = len(points)
+        clusters = [None]*k
+    
+        # group points in clusters
+        for i in xrange(k):
+            clusters[i] = [j for g,j in
+                           zip(gamma, range(n)) if g == i]
+
+        mapping = []
+        
+        for i in xrange(k):
+
+            objVals = [relation[j][2] for j in clusters[i]]
+            l = np.argmin(objVals)
+            minIndex = clusters[i][l]
+
+            # workload features -> alpha (scheduler parameters
+            mapping.append((relation[minIndex][0], relation[minIndex][1]))
+
+        #######################
+        #     Learning
+        #######################
+        self.elm = ELM()
+            
+        inData = [ m[0] for m in mapping ]
+        outData = [ m[1] for m in mapping ]
+
+        self.elm.train(inData, outData)
         
         return None
     # learn
@@ -60,7 +101,8 @@ class Euler:
             if ended:
                 self.learn(self.prober.getRelation())
 
-        # regular execution
+        # regular execution, we tune scheduling parameter
+        # according to learned mapping
         elif ticks % self.prober.getTickWindow() == 0:
             assert self.elm is not None
 
