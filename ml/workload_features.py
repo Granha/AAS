@@ -1,4 +1,4 @@
-from metric.metric import Metric
+from metrics.metric import Metric
 from numpy.fft import fft
 
 import numpy as np
