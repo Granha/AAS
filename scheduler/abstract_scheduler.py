@@ -35,4 +35,7 @@ class AbstractScheduler:
     def getAlphaRange(self):
         return None
 
+    def registerTimerCallBack(self):        
+        return None
+
 # AbstractScheduler
