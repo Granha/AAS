@@ -1,5 +1,5 @@
 from scipy.stats import multivariate_normal
-from ml.common import cluster_figure
+from ml.common import clusterFigure
 from ml.common import proj
 from ml.kmeans import kmeans
 from ml.kmeans import J_avg_2
@@ -67,14 +67,14 @@ def manualTest():
     if RUN_KMEANS:
         centroids, gamma, distortion = kmeans(k, points, EPS, flag=False)
 
-        figCluster, ax = cluster_figure('k-means Colored Cluster',
+        figCluster, ax = clusterFigure('k-means Colored Cluster',
                                     points, gamma, centroids)
         figCluster.show()
     
     # run k-means++
     centroids_pp, gamma_pp, distortion  = kmeans(k, points, EPS)
     
-    figCluster, ax = cluster_figure('k-means++ Colored Cluster',
+    figCluster, ax = clusterFigure('k-means++ Colored Cluster',
                                         points, gamma_pp, centroids_pp)
     figCluster.show()
         
@@ -124,7 +124,7 @@ class TestKmeans(unittest.TestCase):
 # TestKmeans
 
 if __name__ == '__main__':
-    Manual = True
+    Manual = False
     if Manual:
         manualTest()
     else:        
