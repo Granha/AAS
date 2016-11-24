@@ -60,12 +60,19 @@ class Task:
         return self.timesScheduled
 
     def getAvgBlocking(self):
+        usedCpuTime = self.getUsedCpuTime()
+
+        if usedCpuTime == 0:
+            return 0
+        
         return float(self.getTimesBlocked())/\
             self.getUsedCpuTime()
+    # getAvgBlocking
 
     def getAvgReadyWait(self):
         return float(self.getTotalReadyWait())/\
-            self.getTimesScheduled()
+            (self.getTimesScheduled()+1e-5)
+    # getAvgReadyWait
 
     def getRemainingCpuTime(self):
         return self.totalCpuTime - self.usedCpuTime
@@ -144,6 +151,9 @@ class Task:
     #################################
     def incUsedCpuTime(self, amount):
         self.usedCpuTime += amount
+
+    def incTotalReadyWait(self, amount):
+        self.totalReadyWait += amount        
 
 # TODO: work on this bug
 #        assert self.getUsedCpuTime() <= self.getTotalCpuTime()

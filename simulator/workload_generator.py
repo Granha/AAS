@@ -1,6 +1,6 @@
 from iom.io import IO
 from iom.io_list import IOList
-from task.task import Task
+from taskm.task import Task
 from workload import Workload
 from io_generator import IOGenerator
 import numpy as np
