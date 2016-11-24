@@ -35,7 +35,10 @@ class AbstractScheduler:
     def getAlphaRange(self):
         return None
 
-    def registerTimerCallBack(self):        
+    def registerTimerCallBack(self):
+        return None
+
+    def getAllTaks(self):
         return None
 
 # AbstractScheduler

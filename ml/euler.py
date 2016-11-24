@@ -9,6 +9,7 @@
 # Learning Machine (ELM) due to its training efficient.
 #
 ######################################################################
+from metric.metric import Metric
 from ml.elm import ELM
 from ml.workload_prober import WorkloadProber
 
@@ -35,11 +36,10 @@ class Euler:
         # TODO: use k++ to cluster the relation
         # values
 
-        # TODO: learn using the ELM        
+        # TODO: learn using the ELM
         
         return None
     # learn
-
 
     def timerCallBack(self, ticks):
 
@@ -63,6 +63,8 @@ class Euler:
         # regular execution
         elif ticks % self.prober.getTickWindow() == 0:
             assert self.elm is not None
+
+            tasks = self.scheduler.getAllTaks()
 
             wFeatures = WorkloadFeatures(tasks)
 

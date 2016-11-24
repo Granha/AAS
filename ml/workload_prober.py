@@ -29,7 +29,7 @@ class WorkloadProber:
         self.alpha = None
 
         # range for scheduler parameters
-        self.alphaRange = scheduler.getRange()
+        self.alphaRange = scheduler.getAlphaRange()
 
         self.maxIndices = [len(range) for range\
                            in self.alphaRange]
@@ -68,7 +68,7 @@ class WorkloadProber:
         if self.curIdices[i] == self.maxIndices[i]:
             self.curIdices[i] = 0
 
-            if i > 1:
+            if i >= 1:
                 return self.incCurIndicesAux(i-1)
             elif i == 0:
                 return True
@@ -93,16 +93,18 @@ class WorkloadProber:
 
         self.curIdices = [0 for i in xrange(len(self.maxIndices))]
 
-        self.relation = []        
+        self.relation = []
     # startProbing
 
     # Vary scheduler parameters
     # and store objective values
-    def probe(self, tasks):               
+    def probe(self):
 
         # nothing to do
         if not self.isProbing:
             return False
+
+        tasks = self.scheduler.getAllTaks()
 
         # compute the features
         # correspoding to the current
@@ -121,7 +123,7 @@ class WorkloadProber:
         if self.incCurIndices():
             self.isProbing = False
 
-            return True        
+            return True
         
         return False
     # probe
