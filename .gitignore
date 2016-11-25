@@ -3,3 +3,5 @@
 *.py[cod]
 
 *.log
+
+test/manual/out/*

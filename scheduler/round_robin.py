@@ -6,8 +6,9 @@ class RoundRobin(AbstractScheduler):
     # Time Slice in ticks
     TimeSlice = 4
 
-    def __init__(self):
-        AbstractScheduler.__init__(self, RoundRobin.TimeSlice)
+    def __init__(self, enableEuler=True):
+        AbstractScheduler.__init__(self, RoundRobin.TimeSlice,
+                                   enableEuler=enableEuler)
         self.fifo = []
         self.curTaskTicks = 0
         self.setAlpha([RoundRobin.TimeSlice])

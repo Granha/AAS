@@ -9,12 +9,14 @@
 # Learning Machine (ELM) due to its training efficient.
 #
 ######################################################################
+from metrics.metric import Metric
 from metrics.workload_prober import WorkloadProber
 from ml.elm import ELM
 from ml.kmeans import kmeans
 from ml.workload_features import WorkloadFeatures
 
 import numpy as np
+import time
 
 class Euler:
 
@@ -26,14 +28,79 @@ class Euler:
 
     # Maximum number of clusters
     K = 10
+
+    OUTPUT_DIR = 'out/'
+    FILE_PREFIX_OBJ_VA = OUTPUT_DIR + 'obj_val_'
+    FILE_PREFIX_ALPHA = OUTPUT_DIR + 'alpha_'
+    FILE_PREFIX_WORKLOAD = OUTPUT_DIR + 'workload_'
+    SUFFIX = '.dat'
     
-    def __init__(self, scheduler):
-        self.prober = WorkloadProber(scheduler)
+    def __init__(self, scheduler, enabled=True):
         self.scheduler = scheduler
+        self.enabled = enabled
+        self.prober = WorkloadProber(scheduler)
         self.elm = None
 
-        scheduler.registerTimerCallBack(self.timerCallBack)        
-    # __init__    
+        self.objValFile = None
+        self.alphaFile = None
+        self.workloadFile = None
+
+        self.initFiles()
+
+        scheduler.registerTimerCallBack(self.timerCallBack)
+    # __init__
+
+    def __del__(self):
+
+        if self.objValFile is not None:
+            self.objValFile.close()
+
+        if self.alphaFile is not None:
+            self.alphaFile.close()
+
+        if self.workloadFile is not None:
+            self.workloadFile.close()
+    # __del__
+        
+    def initFiles(self):
+        assert self.objValFile is None
+        assert self.alphaFile is None
+        assert self.workloadFile is None
+        
+        status = 'enabled_'
+        if not self.enabled:
+            status = 'disabled_'
+
+        time_stamp = str(time.time())
+        
+        name = Euler.FILE_PREFIX_OBJ_VA + status \
+                          + time_stamp + Euler.SUFFIX
+        self.objValFile = open(name, "w")
+        
+        name = Euler.FILE_PREFIX_ALPHA + status \
+                         + time_stamp + Euler.SUFFIX
+        self.alphaFile = open(name, "w")
+        
+        name = Euler.FILE_PREFIX_WORKLOAD + status \
+                            + time_stamp + Euler.SUFFIX
+        self.workloadFile = open(name, "w")        
+    # initFiles
+
+    def collectStat(self, ticks):
+        tasks = self.scheduler.getAllTaks()
+
+        alpha = self.scheduler.getAlpha()
+
+        wFeatures = WorkloadFeatures(tasks)
+        features = wFeatures.getFeatures()
+
+        objVal = Metric.objFunction(tasks,
+                                    self.scheduler.getCurTime())
+        
+        self.objValFile.write("%d %f\n" % (ticks, objVal))
+        self.alphaFile.write("%d %s\n" % (ticks, str(alpha)))
+        self.workloadFile.write("%d %s\n" % (ticks, str(features)))        
+    # collectStact
 
     # Use Neural Network (ELM) to learn
     # the best mapping from workload
@@ -41,6 +108,7 @@ class Euler:
     # (prior to this phase sufficient
     # data must have been collected)
     def learn(self, relation):
+        assert self.enabled
 
         ###########################
         #      Clustering
@@ -72,7 +140,8 @@ class Euler:
             minIndex = clusters[i][l]
 
             # workload features -> alpha (scheduler parameters
-            mapping.append((relation[minIndex][0], relation[minIndex][1]))
+            mapping.append((relation[minIndex][0],
+                            relation[minIndex][1]))
 
         #######################
         #     Learning
@@ -82,12 +151,15 @@ class Euler:
         inData = np.array([m[0].getFeatures() for m in mapping ])
         outData = np.array([m[1] for m in mapping ])
         
-        self.elm.train(inData, outData)
-        
-        return None
+        self.elm.train(inData, outData)        
     # learn
 
-    def timerCallBack(self, ticks): 
+    def timerCallBack(self, ticks):
+        if ticks % self.prober.getTickWindow() == 0:
+            self.collectStat(ticks)
+
+        if not self.enabled:
+            return
 
         # beginning of a learning cycle
         if ticks % Euler.CycleTicks == 0:

@@ -5,7 +5,7 @@ from taskm.idle_task import IdleTask
 # must comply to this interface.
 class AbstractScheduler:
 
-    def __init__(self, timeSlice):
+    def __init__(self, timeSlice, enableEuler=True):
         # callbacks to be executed at each
         # timer interrupt
         self.callbacks = []
@@ -22,7 +22,7 @@ class AbstractScheduler:
 
         self.idleTask = IdleTask()
 
-        self.euler = Euler(self)
+        self.euler = Euler(self, enabled=enableEuler)
     # __init__
 
     def start(self):

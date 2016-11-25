@@ -22,11 +22,13 @@ class Metric:
 
         partI = [ interact[i]*((tasks[i].getAvgReadyWait())**4) \
                   for i in xrange(len(interact)) \
-                  if interact[i] >= 0.5 ]
+                  if interact[i] >= 0.2 ]
+        
         partC = [ tasks[i].getUsedCpuTime()/(currentProcessorTime - tasks[i].getCreationTime()) \
                        for i in xrange(len(proc)) \
-                       if proc[i] > 0.5]
-        objectivevalue = sum( partI) + sum(partC)
+                       if proc[i] > 0.8]
+        
+        objectivevalue = sum(partI) + sum(partC)
         
         return objectivevalue
     # objFunction
