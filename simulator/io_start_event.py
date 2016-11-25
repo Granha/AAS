@@ -1,4 +1,6 @@
-class IOStartEvent:
+from abstract_event import AbstractEvent
+
+class IOStartEvent(AbstractEvent):
 
     def __init__(self, time, task, duration):
         self.time = time
