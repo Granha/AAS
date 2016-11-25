@@ -31,14 +31,21 @@ class RoundRobin(AbstractScheduler):
 
     def _unblock(self, task):
         self.enqueue(task)
-#        self.schedule()
+        runningTask = self.processor.getRunningTask()
+
+        if runningTask.isIdleTask():
+            self.schedule()
 
     def _finishTask(self, task):
         self.schedule()
 
     def _createTask(self, task):
-        self.enqueue(task)        
-#        self.schedule()
+        self.enqueue(task)
+
+        runningTask = self.processor.getRunningTask()
+
+        if runningTask.isIdleTask():        
+            self.schedule()
 
     def setProcessor(self, processor):
         self.processor = processor
