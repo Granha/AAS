@@ -27,26 +27,33 @@ class BSDScheduler(AbstractScheduler):
     MinPri = 0
     MaxPri = 63
 
-    def __init__(self, alpha=Alpha):
+    Alpha1Range = [  59.0/60 ]
+    Alpha2Range = [ 2, 4, 6 ]
+    Alpha3Range = [ 2, 4 ]
+    Alpha4Range = [ 2, 4 ]
+    # Time slice
+    Alpha5Range = [2, 4, 6, 8, 10 ]
+
+    def __init__(self, alpha=Alpha, enableEuler=True):
+        AbstractScheduler.__init__(self, BSDScheduler.TimeSlice,
+                                   enableEuler=enableEuler)        
         self.mlfq = MLFQ(BSDScheduler.MinPri, BSDScheduler.MaxPri)
         self.processor = None
         self.idleTask = IdleTask()
         self.curTaskTicks = 0
         self.loadAvg = 0.0
         self.alpha = alpha
+    # __init__
 
     def enqueue(self, task):
         self.mlfq.enqueue(task)
-
-    def start(self):
-        self.schedule()
 
     # update scheduler interal update
     # every forth tick
     def update_forth_tick(self):
         tasks = self.mlfq.listify()
 
-        self.mlfq.empitfy()
+        self.mlfq.emptify()
 
         for task in tasks:
             recentCpu = task.getRecentCpu()
@@ -75,8 +82,8 @@ class BSDScheduler(AbstractScheduler):
             recentCpu = task.getRecentCpu()
             nice = task.getNice()
 
-            recentCpu = ((self.alpha[3]*self.loadAvg)/(self.alpha[3]*self.loadAvg +1.0))\
-                        *recentCpu  + nice
+            recentCpu = ((self.alpha[3]*self.loadAvg)/\
+                         (self.alpha[3]*self.loadAvg +1.0))*recentCpu  + nice
             
             task.setRecentCpu(recentCpu)
 
@@ -86,14 +93,17 @@ class BSDScheduler(AbstractScheduler):
         if not runningTask.isIdleTask():
             readyThreads += 1
 
-        self.loadAvg = self.alpha[0]*self.loadAvg + (1-self.alpha[0])*readyThreads
+        self.loadAvg = self.alpha[0]*self.loadAvg + \
+                       (1-self.alpha[0])*readyThreads
+    # update_each_second
                 
-    def timerIntr(self, ticks):
+    def _timerIntr(self, ticks):
         self.curTaskTicks += 1
 
         runningTask = self.processor.getRunningTask()
-
+        
         assert runningTask is not None
+        assert not runningTask.isInIO()
 
         runningTask.incRecentCpu()
 
@@ -111,43 +121,21 @@ class BSDScheduler(AbstractScheduler):
         if self.curTaskTicks >= BSDScheduler.TimeSlice or \
            bestPriority > priority:
             self.schedule()
-
-    def block(self, task):
-        task.incTimesBlocked()
-        
-        self.schedule()
-
-    def unblock(self, task):
-        self.enqueue(task)        
-        self.schedule()
-
-    def finishTask(self, task):
-        self.schedule()
-
-    def createTask(self, task):
-        self.enqueue(task)        
-        self.schedule()
-
-    def setProcessor(self, processor):
-        self.processor = processor
+    # _timerIntr
 
     def nextToRun(self):
         if self.mlfq.isEmpty():
             return self.idleTask
 
         return self.mlfq.extractMin()
+    # nextToRun
 
-    def schedule(self):
-        task = self.processor.premptRunningTask()
-        
-        self.enqueue(task)
-        
-        next = self.nextToRun()
-
-        assert next is not None
-
-        self.curTaskTicks = 0
-
-        self.processor.runTask(next)        
+    def getAlphaRange(self):
+        return [ BSDScheduler.Alpha1Range, 
+                 BSDScheduler.Alpha2Range,
+                 BSDScheduler.Alpha3Range,
+                 BSDScheduler.Alpha4Range,
+                 BSDScheduler.Alpha5Range ]
+    # getAlphaRange
 
 # BSDScheduler

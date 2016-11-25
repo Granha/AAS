@@ -4,14 +4,12 @@ from simulator.simulator import Simulator
 from simulator.workload_generator import WorkloadGenerator
 
 
-if __name__ == '__main__':
-    
-    wGen = WorkloadGenerator()
-    scheduler = BSDScheduler()
+if __name__ == '__main__':    
+    scheduler = BSDScheduler(enableEuler=False)
     
     simulator = Simulator(scheduler)
 
-    workload = wGen.dummyGen()
+    workload = WorkloadGenerator.dummyGen()
 
     simulator.setWorkload(workload)
 

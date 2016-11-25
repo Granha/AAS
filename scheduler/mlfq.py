@@ -52,7 +52,7 @@ class MLFQ:
     def listify(self):
         return [ task for queue in self.queues for task in queue]
 
-    def empitfy(self):
+    def emptify(self):
         self.queues = [ [ ] for i in xrange(self.levels) ]
 
     def addList(self, tasks):

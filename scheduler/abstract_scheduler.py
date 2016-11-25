@@ -15,7 +15,7 @@ class AbstractScheduler:
 
         # scheduler parameters by convetion alpha[-1] is the time
         # slice
-        self.alpha = [timeSlice]
+        self.alpha = [ timeSlice ]
 
         # processor on which tasks are going to be scheduled
         self.processor = None
@@ -28,8 +28,11 @@ class AbstractScheduler:
     def start(self):
         """
         Start scheduler execution.
-        """
-        raise NotImplementedError
+        """        
+        self.schedule()
+
+    def enqueue(self, task):
+        raise NotImplementedError        
 
     def timerIntr(self, ticks):
         self.processCallbacks(ticks)
@@ -45,7 +48,7 @@ class AbstractScheduler:
         self._block(task)
 
     def _block(self, task):
-        raise NotImplementedError        
+        self.schedule()
 
     def unblock(self, task):
         curTime = self.processor.getTime()
@@ -53,25 +56,38 @@ class AbstractScheduler:
         task.unblock(curTime)
 
         self._unblock(task)
+    # unblock
 
     def _unblock(self, task):
-        raise NotImplementedError
+        self.enqueue(task)
+        runningTask = self.processor.getRunningTask()
+
+        if runningTask.isIdleTask():
+            self.schedule()
+    # _unblock
     
     def createTask(self, task):
         self.tasks.append(task)
         self._createTask(task)
 
     def _createTask(self, task):
-        raise NotImplementedError
+        self.enqueue(task)
+
+        runningTask = self.processor.getRunningTask()
+
+        if runningTask.isIdleTask():        
+            self.schedule()
+    # _createTask
 
     def finishTask(self, task):
         assert task in self.tasks
         self.tasks.remove(task)
         
         self._finishTask(task)
+    # finishTask
 
     def _finishTask(self, task):
-        raise NotImplementedError
+        self.schedule()    
 
     def setProcessor(self, processor):
         self.processor = processor
@@ -107,4 +123,23 @@ class AbstractScheduler:
 
     def getCurTime(self):
         return self.processor.getTime()
+
+    def nextToRun(self):
+        raise NotImplementedError
+
+    def schedule(self):
+        task = self.processor.premptRunningTask()
+        
+        self.enqueue(task)
+        
+        next = self.nextToRun()
+
+        assert next is not None
+        assert not next.isInIO()
+
+        self.curTaskTicks = 0
+        
+        self.processor.runTask(next)
+    # schedule    
+
 # AbstractScheduler
