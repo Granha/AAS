@@ -131,7 +131,7 @@ class BSDScheduler(AbstractScheduler):
     # nextToRun
 
     def getAlphaRange(self):
-        return [ BSDScheduler.Alpha1Range, 
+        return [ BSDScheduler.Alpha1Range,
                  BSDScheduler.Alpha2Range,
                  BSDScheduler.Alpha3Range,
                  BSDScheduler.Alpha4Range,
