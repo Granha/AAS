@@ -26,7 +26,7 @@ class Processor:
             runningTask.incUsedCpuTime(ellapsed)
 
         self.runningTask = None
-        self.tickCurTask = 0
+        self.startTimeCurTask = 0
         
         return runningTask
 
