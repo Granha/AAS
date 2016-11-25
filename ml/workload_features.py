@@ -76,6 +76,8 @@ class WorkloadFeatures:
     # computeFourier
 
     def extractFeatures(self, tasks):
+        interactVec = Metric.interacMetric(tasks)
+        
         moments = self.computeMoments(tasks)        
         fourier = self.computeFourier(tasks)
 
@@ -86,6 +88,12 @@ class WorkloadFeatures:
         fourier = fourier / (norm + 1e-15)
         
         features = moments.tolist() + fourier.tolist()
+
+        # Idea to improve the feature vector
+        # if necessary
+        #nWeaklyInter = len([inter for inter in interacMetric if inter >= 1.0/4])
+
+        #nInter = len([inter for inter in interacMetric if inter >= 1.0/2])                
 
         norm = np.linalg.norm(features)
 

@@ -13,7 +13,7 @@ class WorkloadProber:
 
     # used to determine the unit of time
     # to collect workload data
-    SliceMult = 100000
+    SliceMult = 1000
 
     # number of samples for each alpha
     AlphaMult = 4

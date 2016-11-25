@@ -9,19 +9,22 @@
 # Learning Machine (ELM) due to its training efficient.
 #
 ######################################################################
+from metrics.workload_prober import WorkloadProber
 from ml.elm import ELM
 from ml.kmeans import kmeans
-from ml.workload_prober import WorkloadProber
+from ml.workload_features import WorkloadFeatures
+
+import numpy as np
 
 class Euler:
 
-    # 5 minutes (assuming 100 ticks is 1 second)
-    CycleTicks = 5*60*100
+    # 1 minutes (assuming 100 ticks is 1 second)
+    CycleTicks = 1*60*100
 
     # Minimum progress parameter for K-Means++
     EPS = 1e-3
 
-    # Number of
+    # Maximum number of clusters
     K = 10
     
     def __init__(self, scheduler):
@@ -46,11 +49,8 @@ class Euler:
         points = [ features.getFeatures() \
                    for (features, alpha, objVal) in relation ]
 
-        print points
-        import sys
-        sys.exit(1)
-
         centroids, gamma, distortion = kmeans(k, points, Euler.EPS)
+        k = len(centroids)
 
         ###############################
         #    Learning pre-processing
@@ -79,9 +79,9 @@ class Euler:
         #######################
         self.elm = ELM()
             
-        inData = [ m[0] for m in mapping ]
-        outData = [ m[1] for m in mapping ]
-
+        inData = np.array([m[0].getFeatures() for m in mapping ])
+        outData = np.array([m[1] for m in mapping ])
+        
         self.elm.train(inData, outData)
         
         return None
@@ -116,11 +116,12 @@ class Euler:
             tasks = self.scheduler.getAllTaks()
 
             wFeatures = WorkloadFeatures(tasks)
+            features = wFeatures.getFeatures()
 
             # get the best learned scheduler
             # parameter given the past time
             # window
-            alpha = self.elm.processSingle(wFeatures)
+            alpha = self.elm.processSingle(features)
 
             self.scheduler.setAlpha(alpha)
     # timerCallBack

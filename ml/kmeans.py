@@ -67,6 +67,11 @@ def J_avg_2(centroids, points, gamma):
                  for i in range(0,len(points))])
 # J_avg_2
 
+def filter_similar(points, p, thr=5e-2):
+
+    return [p2 for p2 in points \
+            if np.linalg.norm(np.array(p)-np.array(p2)) > thr]
+
 # Initialization of the k-means++ Algorithm
 # We select centroids in a probabilistic manner
 # favoring points that are far from the currently
@@ -80,9 +85,12 @@ def kmeansppInit(k, origPoints):
     # choose the first centroid uniformly at random
     centroids.append(random.sample(points,1)[0])
 
-    points.remove(centroids[0])
+    points = filter_similar(points, centroids[0])
     
     for i in range(1,k):
+
+        if len(points) == 0:
+            break        
 
         prob = [None]*len(points)
         for j in range(0,len(points)):
@@ -98,7 +106,7 @@ def kmeansppInit(k, origPoints):
         pos = np.random.choice(range(0,len(prob)), p=prob)
 
         centroids.append(points[pos])
-        points.remove(centroids[i])
+        points = filter_similar(points, centroids[i])
 
     return centroids
 # kmeansppInit
@@ -111,6 +119,7 @@ def kmeansAux(k, points, EPS, flag=True):
         centroids = random.sample(points,k)
     else:
         centroids = kmeansppInit(k,points)
+        k = len(centroids)
 
     gamma = clusterAssignment(centroids,points)
 
