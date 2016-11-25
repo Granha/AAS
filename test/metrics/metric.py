@@ -1,7 +1,8 @@
-from metrics.metric import Metric
 from iom.io import IO
 from iom.io_list import IOList
-from task.task import Task
+from metrics.metric import Metric
+from taskm.task import Task
+
 import unittest
 import math
 
