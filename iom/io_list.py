@@ -14,5 +14,12 @@ class IOList:
         if i < len(self.ios):
             return self.ios[i]
 
-        return None        
+        return None
+
+    def prettyPrint(self, start=0):
+        print "-"*5 + "[IOList]"+ "-"*5
+        ios = self.ios[start:]
+        for io in ios:
+            io.prettyPrint()
+        print "-"*15
 # IOList

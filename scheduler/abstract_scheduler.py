@@ -33,6 +33,7 @@ class AbstractScheduler:
 
     def timerIntr(self, ticks):
         self.processCallbacks(ticks)
+
         self._timerIntr(ticks)
 
     def _timerIntr(self, ticks):

@@ -10,7 +10,7 @@ class RoundRobin(AbstractScheduler):
         AbstractScheduler.__init__(self, RoundRobin.TimeSlice)
         self.fifo = []
         self.curTaskTicks = 0
-        self.setAlpha((RoundRobin.TimeSlice))
+        self.setAlpha([RoundRobin.TimeSlice])
 
     def enqueue(self, task):
         if task is not None and \
@@ -23,7 +23,7 @@ class RoundRobin(AbstractScheduler):
     def _timerIntr(self, ticks):
         self.curTaskTicks += 1
         
-        if self.curTaskTicks >= RoundRobin.TimeSlice:
+        if self.curTaskTicks >= self.getTimeSlice():
             self.schedule()
 
     def _block(self, task):
@@ -31,14 +31,14 @@ class RoundRobin(AbstractScheduler):
 
     def _unblock(self, task):
         self.enqueue(task)
-        self.schedule()
+#        self.schedule()
 
     def _finishTask(self, task):
         self.schedule()
 
     def _createTask(self, task):
         self.enqueue(task)        
-        self.schedule()
+#        self.schedule()
 
     def setProcessor(self, processor):
         self.processor = processor
@@ -57,6 +57,7 @@ class RoundRobin(AbstractScheduler):
         next = self.nextToRun()
 
         assert next is not None
+        assert not next.isInIO()
 
         self.curTaskTicks = 0
         
@@ -64,7 +65,7 @@ class RoundRobin(AbstractScheduler):
     # schedule
 
     def getAlphaRange(self):
-
+        # Possible Time Slice values for Round Robin
         return [[2, 4, 6, 8, 10, 12, 16, 20, 40]]
         
 # RoundRobin

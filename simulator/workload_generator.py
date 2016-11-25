@@ -47,17 +47,17 @@ class WorkloadGenerator:
        logging.info('Task'+str(i)+":Creation Time:"+str(creation_Time)+":Total CPU time:"+str(TotalCPUTime))
        IO = IOGenerator( self.rate_io, TotalCPUTime, self.mean_io_time, self.sd_io_time, self.time_unit)
        iolist = IOList( IO.generateIOEvent())
-       T = Task("Task 0", 0, creation_Time, TotalCPUTime, iolist)
+       T = Task("Task 0", 0, np.abs(creation_Time), np.abs(TotalCPUTime), iolist)
        W.append(T)
 
-       for i in range(self.num_jobs):
+       for i in xrange(self.num_jobs):
           creation_Time = round(random.expovariate(self.rate_jobs)*self.time_unit)+W[-1].creationTime
           TotalCPUTime =  np.random.normal(self.mean_job_time,self.sd_job_time)
           TotalCPUTime = round(TotalCPUTime*self.time_unit)
           logging.info('Task'+str(i)+":Creation Time:"+str(creation_Time)+":Total CPU time:"+str(TotalCPUTime))
           IO = IOGenerator( self.rate_io, TotalCPUTime, self.mean_io_time, self.sd_io_time, self.time_unit)
           iolist = IOList( IO.generateIOEvent())
-          T = Task("Task "+str(i), 0, creation_Time, TotalCPUTime, iolist)
+          T = Task("Task "+str(i), 0, np.abs(creation_Time), np.abs(TotalCPUTime), iolist)
           W.append(T)
        w =Workload(W)
        return w     

@@ -12,4 +12,8 @@ class IO:
 
     def getDuration(self):
         return self.duration
+
+    def prettyPrint(self):
+        print "IO(offset=%f, duration=%f)" \
+            % (self.getOffsetTime(), self.getDuration())
 # IO

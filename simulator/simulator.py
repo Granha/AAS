@@ -38,13 +38,13 @@ class Simulator:
 
         # there must always exist at least a timer interrupt
         assert nextEvent is not None
-
         window = nextEvent.getTime() - self.processor.getTime()
                 
         if task.stillHasIO():
             io = task.getNextIO()
 
             relativeIOTime = io.getOffsetTime() - task.getUsedCpuTime()
+            assert relativeIOTime >= 0
 
             # IO will occur between the current time and the next event                    
             if  window > relativeIOTime:
@@ -56,6 +56,7 @@ class Simulator:
             # fi
         else:
             relativeFinishTime = task.getTotalCpuTime() - task.getUsedCpuTime()
+            assert relativeFinishTime >= 0
             
             if window > relativeFinishTime:
                 time = self.processor.getTime() + relativeFinishTime
@@ -86,12 +87,13 @@ class Simulator:
         # Main Loop
         while not queue.isEmpty():
             event = queue.extractMin()
-
+            
             # time can be an arbitrary real number
             self.processor.setTime(event.getTime())
+            self.processor.updateRunningTask()
             
             if isinstance(event, TimerEvent):
-                print "Timer Event"
+                print "Timer Event [Tick=%d]" % event.getTime()
 
                 # tick is only integer
                 self.processor.setTicks(event.getTime())
@@ -122,14 +124,15 @@ class Simulator:
                 # inform scheduler that task finished
                 self.scheduler.finishTask(task)
 
-                nTasks -= 1
-
-                # all tasks finished
-                if nTasks == 0:
-                    return
+                # TODO: fix finishing bug
+                if len(self.scheduler.getAllTaks()) == 0:
+                    return                
                 
             elif isinstance(event, IOStartEvent):
                 task = event.getTask()
+                runningTask = self.processor.getRunningTask()
+
+                assert task is runningTask
                 
                 self.processor.premptRunningTask()
                 
@@ -151,8 +154,6 @@ class Simulator:
             elif isinstance(event, IOCompleteEvent):
                 task = event.getTask()
                 print "IO Complete: ", task.getName()
-
-                task.setInIO(False)
 
                 # inform scheduler that task is ready
                 self.scheduler.unblock(task)

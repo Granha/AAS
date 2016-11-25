@@ -15,7 +15,8 @@ class Task:
         self.totalCpuTime = totalCpuTime
         self.ioList = ioList
         self.nextIO = 0
-        self.boolIsInIO = False
+        self._isRunning = False
+        self._isInIO = False
         self.nice = 0
         self.recentCpu = 0
         self.timesBlocked = 0
@@ -93,8 +94,14 @@ class Task:
     def setNice(self, nice):
         self.nice = nice
 
+    def setIsRunning(self, isRunning):
+        self._isRunning = isRunning
+
     def setUsedCpuTime(self, usedCpuTime):
-        assert usedCpuTime <= self.getTotalCpuTime()
+        if not self.isIdleTask():
+            assert usedCpuTime <= self.getTotalCpuTime()
+            
+        assert usedCpuTime >= self.usedCpuTime
         self.usedCpuTime = usedCpuTime
 
     def setTimesBlocked(self, timesBlocked):
@@ -115,7 +122,8 @@ class Task:
         self.timesBlocked += 1
 
     def incTimesScheduled(self):
-        self.timesScheduled += 1        
+        self.timesScheduled += 1
+
 
     #######################
     #   Scheduler methods
@@ -126,10 +134,10 @@ class Task:
     #   Simulator methods
     ##########################
     def isInIO(self):
-        return self.boolIsInIO
+        return self._isInIO
     
     def setInIO(self, val):
-        self.boolIsInIO = val
+        self._isInIO = val
     
     def popNextIO(self):
         io = self.getNextIO()
@@ -151,38 +159,54 @@ class Task:
         self.incTimesBlocked()
         self.startReadyWait = None
 
-        self.boolIsInIO = True
+        self._isInIO = True
+        self.setIsRunning(False)
     # block
 
     def unblock(self, curTime):
+        assert not self.isRunning()
+        
         self.startReadyWait = curTime
-
-        self.boolIsInIO = False
+ 
+        self._isInIO = False 
     # unblock
 
     def schedule(self, curTime):
-        ellapsed = curTime - self.startReadyWait
+        startReadyWait = self.startReadyWait
+        assert startReadyWait is not None
+        
+        ellapsed = curTime - startReadyWait
 
-        print curTime
-        print self.startReadyWait
+        assert ellapsed >= 0
 
-        print ellapsed
-        import sys
-
-# TODO: FIX this bug
-#        assert ellapsed >= 0
-
-        self.incTotalReadyWait(ellapsed)
-
+        self.incTotalReadyWait(ellapsed)        
         self.incTimesScheduled()
+
+        assert not self.isRunning()        
+        self.setIsRunning(True)
     # schedule
 
-    def prempt(self, curTime, ellapsedCpuTime):
-        self.startReadyWait = curTime
+    def prempt(self, curTime):
+        assert self.isRunning()
 
-        self.incUsedCpuTime(ellapsedCpuTime)
+        self.setIsRunning(False)
+        
+        self.startReadyWait = curTime
     # prempt
 
+    def prettyPrint(self):
+        print "<"*20 + "[Task]"
+        print "name=", self.getName()
+        print "creationTime=", self.creationTime
+        print "usedCpuTime=", self.usedCpuTime        
+        print "totalCpuTime=", self.totalCpuTime        
+        print "startReadyWait=",self.startReadyWait
+        print "totalReadyWait=", self.totalReadyWait
+        print "timesScheduled=", self.timesScheduled
+        print "timesBlocked=", self.timesBlocked
+        self.ioList.prettyPrint(self.nextIO)
+        self.ioList.prettyPrint()        
+    # prettyPrint
 
     #################################
     #    Shared methods between
@@ -192,10 +216,9 @@ class Task:
         self.usedCpuTime += amount
 
     def incTotalReadyWait(self, amount):
-        self.totalReadyWait += amount        
-
-# TODO: work on this bug
-#        assert self.getUsedCpuTime() <= self.getTotalCpuTime()
+        assert self.totalReadyWait is not None
+        
+        self.totalReadyWait += amount
 
     # Reset internal state
     def reset(self):
@@ -203,4 +226,7 @@ class Task:
 
     def isIdleTask(self):
         return False
+
+    def isRunning(self):
+        return self._isRunning
 # Task

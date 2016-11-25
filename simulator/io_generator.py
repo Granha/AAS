@@ -31,7 +31,7 @@ class IOGenerator:
            
            list_io.append(iotask)
            i=i+1
-           IOOffset = IOOffset + np.abs(round(random.expovariate(self.rate)*self.time_unit))
+           IOOffset = IOOffset + np.abs(np.ceil(random.expovariate(self.rate)*self.time_unit))
            
         return list_io
     # generateIOEvent

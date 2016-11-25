@@ -23,7 +23,8 @@ class EventQueue:
         if len(self.queue) == 0:
             return None
 
-        return self.queue[0][1]        
+        return self.queue[0][1]
+    # getMin
 
     def extractMin(self):
         return heapq.heappop(self.queue)[1]
