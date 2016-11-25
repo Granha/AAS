@@ -9,7 +9,7 @@
 
 from abstract_scheduler import AbstractScheduler
 from mlfq import MLFQ
-from task.idle_task import IdleTask
+from taskm.idle_task import IdleTask
 
 # hard parameters of BSD scheduler
 Alpha = (59.0/60, 4.0, 2.0, 2.0, 4)

@@ -1,4 +1,6 @@
-class TaskCreationEvent:
+from abstract_event import AbstractEvent
+
+class TaskCreationEvent(AbstractEvent):
 
     def __init__(self, time, task):
         self.time = time

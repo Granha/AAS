@@ -3,9 +3,9 @@
 class AbstractEvent:
 
     def getTime():
-        return None
+        raise NotImplementedError
 
     def getPriority():
-        return None
+        raise NotImplementedError
     
 # AbstractEvent

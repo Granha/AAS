@@ -1,4 +1,6 @@
-class IOCompleteEvent:
+from abstract_event import AbstractEvent
+
+class IOCompleteEvent(AbstractEvent):
 
     def __init__(self, time, task):
         self.time = time

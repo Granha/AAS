@@ -1,4 +1,6 @@
-class TaskFinishEvent:
+from abstract_event import AbstractEvent
+
+class TaskFinishEvent(AbstractEvent):
 
     def __init__(self, time, task):
         self.time = time

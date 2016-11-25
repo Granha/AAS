@@ -1,4 +1,4 @@
-from task.idle_task import IdleTask
+from taskm.idle_task import IdleTask
 
 # Abstract Scheduler. All concrete scheduler
 # must comply to this interface.
