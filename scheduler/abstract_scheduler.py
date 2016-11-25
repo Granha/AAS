@@ -1,10 +1,11 @@
+from ml.euler import Euler
 from taskm.idle_task import IdleTask
 
 # Abstract Scheduler. All concrete scheduler
 # must comply to this interface.
 class AbstractScheduler:
 
-    def __init__(self):
+    def __init__(self, timeSlice):
         # callbacks to be executed at each
         # timer interrupt
         self.callbacks = []
@@ -14,12 +15,14 @@ class AbstractScheduler:
 
         # scheduler parameters by convetion alpha[-1] is the time
         # slice
-        self.alpha = None
+        self.alpha = [timeSlice]
 
         # processor on which tasks are going to be scheduled
         self.processor = None
 
-        self.idleTask = IdleTask()        
+        self.idleTask = IdleTask()
+
+        self.euler = Euler(self)
     # __init__
 
     def start(self):
@@ -36,10 +39,22 @@ class AbstractScheduler:
         raise NotImplementedError
 
     def block(self, task):
-        return None
+        task.block()
+
+        self._block(task)
+
+    def _block(self, task):
+        raise NotImplementedError        
 
     def unblock(self, task):
-        return None
+        curTime = self.processor.getTime()
+
+        task.unblock(curTime)
+
+        self._unblock(task)
+
+    def _unblock(self, task):
+        raise NotImplementedError
     
     def createTask(self, task):
         self.tasks.append(task)
@@ -78,7 +93,7 @@ class AbstractScheduler:
     def registerTimerCallBack(self, callback):
         assert callback not in self.callbacks
 
-        callback.append(callback)
+        self.callbacks.append(callback)
 
     def processCallbacks(self, ticks):
 
@@ -89,4 +104,6 @@ class AbstractScheduler:
     def getAllTaks(self):
         return self.tasks
 
+    def getCurTime(self):
+        return self.processor.getTime()
 # AbstractScheduler

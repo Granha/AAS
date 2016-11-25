@@ -9,7 +9,8 @@ import logging
 
 class WorkloadGenerator:
 
-    def __init__(self, num_jobs, rate_jobs, rate_io, mean_job_time, mean_io_time, sd_job_time, sd_io_time, time_unit):
+    def __init__(self, num_jobs, rate_jobs, rate_io, mean_job_time,
+                 mean_io_time, sd_job_time, sd_io_time, time_unit):
         self.state = None
         self.num_jobs = num_jobs
         self.rate_jobs = rate_jobs

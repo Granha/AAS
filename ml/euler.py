@@ -9,8 +9,8 @@
 # Learning Machine (ELM) due to its training efficient.
 #
 ######################################################################
-from metric.metric import Metric
 from ml.elm import ELM
+from ml.kmeans import kmeans
 from ml.workload_prober import WorkloadProber
 
 class Euler:
@@ -22,14 +22,14 @@ class Euler:
     EPS = 1e-3
 
     # Number of
-    K = 20
-
+    K = 10
+    
     def __init__(self, scheduler):
         self.prober = WorkloadProber(scheduler)
         self.scheduler = scheduler
         self.elm = None
 
-        scheduler.regiterTimerCallBack(self.timerCallBack)        
+        scheduler.registerTimerCallBack(self.timerCallBack)        
     # __init__    
 
     # Use Neural Network (ELM) to learn
@@ -43,7 +43,12 @@ class Euler:
         #      Clustering
         ###########################
         k = Euler.K
-        points = [ features for (features, alpha, objVal) in relation ]
+        points = [ features.getFeatures() \
+                   for (features, alpha, objVal) in relation ]
+
+        print points
+        import sys
+        sys.exit(1)
 
         centroids, gamma, distortion = kmeans(k, points, Euler.EPS)
 
@@ -82,28 +87,30 @@ class Euler:
         return None
     # learn
 
-    def timerCallBack(self, ticks):
+    def timerCallBack(self, ticks): 
 
         # beginning of a learning cycle
-        if ticks % CycleTicks == 0:
+        if ticks % Euler.CycleTicks == 0:
             # probing should be long over by now
             # if it fails it means that the number
             # of ticks in a cycle is not sufficient
-            assert not self.prober.isProbing
+            assert not self.prober.isProbing()
 
             self.prober.startProbing()
 
         # probing the scheduler
         elif self.prober.isProbing():
 
-            ended = self.prober.probe()
+            isDone = self.prober.probe()
 
-            if ended:
+            if isDone:
                 self.learn(self.prober.getRelation())
 
         # regular execution, we tune scheduling parameter
         # according to learned mapping
-        elif ticks % self.prober.getTickWindow() == 0:
+        elif self.elm is not None and \
+             ticks % self.prober.getTickWindow() == 0:
+
             assert self.elm is not None
 
             tasks = self.scheduler.getAllTaks()

@@ -21,6 +21,7 @@ class Task:
         self.timesBlocked = 0
         self.totalReadyWait = 0
         self.timesScheduled = 0
+        self.startReadyWait = creationTime
     # __init__
 
     ######################
@@ -144,6 +145,44 @@ class Task:
             return True
 
         return False
+    # stillHasIO
+
+    def block(self):
+        self.incTimesBlocked()
+        self.startReadyWait = None
+
+        self.boolIsInIO = True
+    # block
+
+    def unblock(self, curTime):
+        self.startReadyWait = curTime
+
+        self.boolIsInIO = False
+    # unblock
+
+    def schedule(self, curTime):
+        ellapsed = curTime - self.startReadyWait
+
+        print curTime
+        print self.startReadyWait
+
+        print ellapsed
+        import sys
+
+# TODO: FIX this bug
+#        assert ellapsed >= 0
+
+        self.incTotalReadyWait(ellapsed)
+
+        self.incTimesScheduled()
+    # schedule
+
+    def prempt(self, curTime, ellapsedCpuTime):
+        self.startReadyWait = curTime
+
+        self.incUsedCpuTime(ellapsedCpuTime)
+    # prempt
+
 
     #################################
     #    Shared methods between

@@ -68,7 +68,9 @@ class WorkloadFeatures:
         maxFreq = np.argmax(coeff)
         maxCoeff = np.max(coeff)
 
-        self.fourier = [ maxFreq, maxCoeff ]
+        n = float(len(coeff)) 
+        
+        self.fourier = [ maxFreq/n, maxCoeff ]
 
         return self.fourier
     # computeFourier
@@ -76,14 +78,20 @@ class WorkloadFeatures:
     def extractFeatures(self, tasks):
         moments = self.computeMoments(tasks)        
         fourier = self.computeFourier(tasks)
+
+        norm = np.linalg.norm(moments)        
+        moments = moments / (norm + 1e-15)
+
+        norm = np.linalg.norm(fourier)
+        fourier = fourier / (norm + 1e-15)
         
-        features = moments + fourier
+        features = moments.tolist() + fourier.tolist()
 
         norm = np.linalg.norm(features)
 
         # normalize the features
         # to make learning more robust
-        features = features / norm
+        features = features / (norm + 1e-15)
 
         self.features = features
 

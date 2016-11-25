@@ -22,8 +22,10 @@ class Processor:
         runningTask = self.runningTask
 
         if runningTask is not None:
-            ellapsed =  self.getTime() - self.startTimeCurTask
-            runningTask.incUsedCpuTime(ellapsed)
+            curTime = self.getTime()
+            ellapsed =  curTime - self.startTimeCurTask
+            runningTask.prempt(curTime=curTime,
+                               ellapsedCpuTime=ellapsed)
 
         self.runningTask = None
         self.startTimeCurTask = 0
@@ -31,7 +33,9 @@ class Processor:
         return runningTask
 
     def runTask(self, task):
-        self.startTimeCurTask = self.getTime()
+        curTime = self.getTime()
+        self.startTimeCurTask = curTime
+        task.schedule(curTime)
         self.runningTask = task
 
     def setTime(self, time):

@@ -6,19 +6,22 @@
 #
 # workload |--> parameter.
 ###################################################
+from metrics.metric import Metric
+from ml.workload_features import WorkloadFeatures
+
 class WorkloadProber:
 
     # used to determine the unit of time
     # to collect workload data
-    SliceMult = 25
+    SliceMult = 100000
 
     # number of samples for each alpha
-    AlphaMult = 2
+    AlphaMult = 4
 
     def __init__(self, scheduler):
         # indicates whether the Prober
         # is probing the scheduler parameter space
-        self.isProbing = False
+        self._isProbing = False
         
         # mathematical relation (feature, alpha, objVal)
         self.relation = []
@@ -39,23 +42,25 @@ class WorkloadProber:
 
         self.nSamples = self.nAlpha*WorkloadProber.AlphaMult
 
+        self.nPasses = 0
+
         self.curIdices = None
 
         # tick window to collect workload
         # and objective function information
         # for a given fixed alpha
-        self.tickWindow = scheduler.getTimeSlice()*\
-                          WorkloadProber.SliceMult
+        self.tickWindow = self.getTickWindow()
     # __init__
 
     def getRelation(self):
         return self.relation
 
     def getTickWindow(self):
-        return self.tickWindow
-
+        return self.scheduler.getTimeSlice()*\
+                          WorkloadProber.SliceMult
+    
     def isProbing(self):
-        return self.isProbing
+        return self._isProbing
     # getIsProbing
 
     def incCurIndicesAux(self, i):
@@ -89,7 +94,11 @@ class WorkloadProber:
     # getCurAlpha
 
     def startProbing(self):
-        self.isProbing = True
+        self._isProbing = True
+
+        self.alpha = None
+
+        self.nPasses = 0        
 
         self.curIdices = [0 for i in xrange(len(self.maxIndices))]
 
@@ -101,29 +110,40 @@ class WorkloadProber:
     def probe(self):
 
         # nothing to do
-        if not self.isProbing:
+        if not self._isProbing:
             return False
 
         tasks = self.scheduler.getAllTaks()
 
-        # compute the features
-        # correspoding to the current
-        # alpha set in the previous pass
-        if self.alpha is not None:
-            wFeatures = WorkloadFeatures(tasks)
+        alpha = self.getCurAlpha()
 
+        # first probe
+        if self.alpha is None:
+            self.alpha = alpha
+            self.scheduler.setAlpha(alpha)
+            return False
+
+        wFeatures = WorkloadFeatures(tasks)
+
+        objVal = Metric.objFunction(tasks,
+                                    self.scheduler.getCurTime())
+
+        self.relation.append((wFeatures, alpha, objVal))            
+
+        isOverflow = self.incCurIndices()
         alpha = self.getCurAlpha()
 
         self.scheduler.setAlpha(alpha)
+        self.alpha = alpha
 
-        objVal = Metric.objFunction(tasks)
+        # end probing phase
+        if isOverflow:
+            self.nPasses += 1
 
-        self.relation.append((wFeatures, alpha, objVal))
-            
-        if self.incCurIndices():
-            self.isProbing = False
-
-            return True
+            if self.nPasses == WorkloadProber.AlphaMult:
+                self._isProbing = False
+                
+                return True
         
         return False
     # probe
