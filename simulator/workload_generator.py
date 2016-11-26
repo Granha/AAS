@@ -20,6 +20,7 @@ class WorkloadGenerator:
         self.sd_job_time = sd_job_time
         self.sd_io_time = sd_io_time
         self.time_unit = time_unit
+        self.work_load_list = None
     # __init__
 
     # dummy generator for initial tests
@@ -62,6 +63,7 @@ class WorkloadGenerator:
           iolist = IOList( IO.generateIOEvent())
           T = Task("Task "+str(i), 0, np.abs(creation_Time), np.abs(TotalCPUTime), iolist)
           W.append(T)
+       self.work_load_list = W
        w =Workload(W)
        return w
    # generateWorkload
