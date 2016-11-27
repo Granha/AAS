@@ -11,6 +11,7 @@
 ######################################################################
 from metrics.metric import Metric
 from metrics.workload_prober import WorkloadProber
+from ml.common import closestVecEl
 from ml.elm import ELM
 from ml.kmeans import kmeans
 from ml.workload_features import WorkloadFeatures
@@ -21,7 +22,9 @@ import time
 class Euler:
 
     # 1 minutes (assuming 100 ticks is 1 second)
-    CycleTicks = 1*60*100
+    CycleTicks = 1*60*10000
+
+    TickOffset = 20
 
     # Minimum progress parameter for K-Means++
     EPS = 1e-3
@@ -155,7 +158,8 @@ class Euler:
     # learn
 
     def timerCallBack(self, ticks):
-        if ticks % self.prober.getTickWindow() == 0:
+        if ticks % self.prober.getTickWindow() \
+           == Euler.TickOffset:
             self.collectStat(ticks)
 
         if not self.enabled:
@@ -171,7 +175,9 @@ class Euler:
             self.prober.startProbing()
 
         # probing the scheduler
-        elif self.prober.isProbing():
+        elif self.prober.isProbing() and \
+             ticks % self.prober.getTickWindow() \
+             == Euler.TickOffset:
 
             isDone = self.prober.probe()
 
@@ -181,7 +187,8 @@ class Euler:
         # regular execution, we tune scheduling parameter
         # according to learned mapping
         elif self.elm is not None and \
-             ticks % self.prober.getTickWindow() == 0:
+             ticks % self.prober.getTickWindow() == \
+             Euler.TickOffset:
 
             assert self.elm is not None
 
@@ -194,6 +201,13 @@ class Euler:
             # parameter given the past time
             # window
             alpha = self.elm.processSingle(features)
+            alphaRange = self.scheduler.getAlphaRange()
+
+            # adjust continuous values returned by the
+            # neural network to valid values in the
+            # range of alpha
+            alpha = [ closestVecEl(alpha[i],alphaRange[i])\
+                      for i in xrange(len(alpha)) ]
 
             self.scheduler.setAlpha(alpha)
     # timerCallBack

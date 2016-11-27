@@ -1,4 +1,7 @@
 # Workload Metric Computator from Estimates
+
+import numpy as np
+
 class Metric:
 
     # interactiveness estimate
@@ -26,7 +29,7 @@ class Metric:
         
         partC = [ tasks[i].getUsedCpuTime()/(currentProcessorTime - tasks[i].getCreationTime()) \
                        for i in xrange(len(proc)) \
-                       if proc[i] > 0.8]
+                       if proc[i] > 0.8 ]
         
         objectivevalue = sum(partI) + sum(partC)
         

@@ -34,7 +34,7 @@ class WorkloadProber:
         # range for scheduler parameters
         self.alphaRange = scheduler.getAlphaRange()
 
-        self.maxIndices = [len(range) for range\
+        self.maxIndices = [len(vals) for vals \
                            in self.alphaRange]
         
         # size of the alpha space
@@ -56,8 +56,10 @@ class WorkloadProber:
         return self.relation
 
     def getTickWindow(self):
-        return self.scheduler.getTimeSlice()*\
-                          WorkloadProber.SliceMult
+        assert self.scheduler.getTimeSlice() > 0
+        return WorkloadProber.SliceMult*4
+#        return self.scheduler.getTimeSlice()*\
+#                          WorkloadProber.SliceMult
     
     def isProbing(self):
         return self._isProbing
@@ -65,10 +67,10 @@ class WorkloadProber:
 
     def incCurIndicesAux(self, i):
 
-        assert i >= 0 and i < len(self.maxIndices)
+        assert i >= 0 and i < len(self.maxIndices)        
 
         self.curIdices[i] += 1
-        
+
         # carry condition
         if self.curIdices[i] == self.maxIndices[i]:
             self.curIdices[i] = 0
@@ -90,7 +92,7 @@ class WorkloadProber:
         alpha = [self.alphaRange[i][self.curIdices[i]]\
                  for i in xrange(len(self.maxIndices)) ]
 
-        return tuple(alpha)
+        return alpha
     # getCurAlpha
 
     def startProbing(self):

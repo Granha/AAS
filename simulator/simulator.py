@@ -79,7 +79,7 @@ class Simulator:
             return
         
         # first timer event
-        timerEvent = TimerEvent(1)
+        timerEvent = TimerEvent(0)
         queue.addEvent(timerEvent)
 
         self.scheduler.start()

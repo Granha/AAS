@@ -28,11 +28,11 @@ class BSDScheduler(AbstractScheduler):
     MaxPri = 63
 
     Alpha1Range = [  59.0/60 ]
-    Alpha2Range = [ 2, 4, 6 ]
-    Alpha3Range = [ 2, 4 ]
-    Alpha4Range = [ 2, 4 ]
+    Alpha2Range = [ 4 ]
+    Alpha3Range = [ 4, 16 ]
+    Alpha4Range = [ 4, 8 ]
     # Time slice
-    Alpha5Range = [2, 4, 6, 8, 10 ]
+    Alpha5Range = [ 2, 4, 8 ]
 
     def __init__(self, alpha=Alpha, enableEuler=True):
         AbstractScheduler.__init__(self, BSDScheduler.TimeSlice,

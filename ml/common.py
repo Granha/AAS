@@ -88,3 +88,13 @@ def clusterFigure(title, points, gamma, centroids):
 
     return figCluster, ax
 # clusterFigure
+
+def closestVecEl(x, vec):
+    diff = [ np.abs(x-el) for el in vec ]
+
+    i = np.argmin(diff)
+
+    return vec[i]
+# closestVecEl
+
+    
