@@ -1,0 +1,28 @@
+Meta information for the test.
+
+class Euler:
+
+    # 1 minutes (assuming 100 ticks is 1 second)
+    CycleTicks = 1*60*10000
+
+    TickOffset = 20
+
+    # Minimum progress parameter for K-Means++
+    EPS = 1e-5
+
+    # Maximum number of clusters
+    K = 100
+
+class WorkloadProber:
+
+    # used to determine the unit of time
+    # to collect workload data
+    SliceMult = 100
+
+    # number of samples for each alpha
+    AlphaMult = 4
+
+
+wGen = WorkloadGenerator(num_jobs=400, rate_jobs=5, rate_io=0.3,
+                         mean_job_time=1000, mean_io_time=3,
+                         sd_job_time=5, sd_io_time=1, time_unit=1)
