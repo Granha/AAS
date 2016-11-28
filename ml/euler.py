@@ -27,10 +27,10 @@ class Euler:
     TickOffset = 20
 
     # Minimum progress parameter for K-Means++
-    EPS = 1e-4
+    EPS = 1e-8
 
     # Maximum number of clusters
-    K = 20
+    K = 10
 
     OUTPUT_DIR = 'out/'
     FILE_PREFIX_OBJ_VA = OUTPUT_DIR + 'obj_val_'

@@ -13,10 +13,10 @@ class WorkloadProber:
 
     # used to determine the unit of time
     # to collect workload data
-    SliceMult = 100
+    SliceMult = 25
 
     # number of samples for each alpha
-    AlphaMult = 4
+    AlphaMult = 6
 
     def __init__(self, scheduler):
         # indicates whether the Prober
